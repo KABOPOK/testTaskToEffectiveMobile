@@ -1,8 +1,23 @@
 #
-# application.yml — главный конфигурационный файл Spring Boot.
+# applicatxion.yml — главный конфигурационный файл Spring Boot.
 
-Что нужно сделать:
-  - Указать настройки подключения к базе данных.
-  - Указать порт приложения.
-  - Настроить параметры безопасности и JWT.
-  - Включить Swagger UI.
+#Что нужно сделать:
+ # - Указать настройки подключения к базе данных.
+#  - Указать порт приложения.
+#  - Настроить параметры безопасности и JWT.
+#  - Включить Swagger UI.
+
+server:
+  port: ${SERVER_PORT}
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${POSTGRES_HOST}:${PORT_DB}/${POSTGRESQL_DATABASE}
+    username: ${POSTGRESQL_USERNAME}
+    password: ${POSTGRESQL_PASSWORD}
+  liquibase:
+    change-log: classpath:/db/changelog/app-changelog.yaml
+    default-schema: public
+    enabled: true
+    drop_first: false

@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  postgres:
+    container_name: bank-postgres
+    image: bitnami/postgresql:15
+    environment:
+      POSTGRESQL_DATABASE: postgres
+      POSTGRESQL_USERNAME: postgres
+      POSTGRESQL_PASSWORD: 9
+    ports:
+      - "5422:5432"

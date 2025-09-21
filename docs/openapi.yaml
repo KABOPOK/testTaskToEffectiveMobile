@@ -1,1 +1,121 @@
-# Здесь будет OpenAPI описание всех доступных эндпоинтов и моделей данных.
+openapi: 3.0.3
+info:
+  title: marketApi
+  description: CRUD API для управления банковскими картами
+  version: 1.0.0
+paths:
+  /cards:
+    get:
+      summary: Получить список всех карт
+      operationId: getAllCards
+      responses:
+        '200':
+          description: Список карт
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CardDto'
+    post:
+      summary: Создать новую карту
+      operationId: createCard
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CardDto'
+      responses:
+        '201':
+          description: Созданная карта
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardDto'
+  /cards/{id}:
+    get:
+      summary: Получить карту по ID
+      operationId: getCardById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Карта
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardDto'
+        '404':
+          description: Карта не найдена
+    put:
+      summary: Обновить карту по ID
+      operationId: updateCard
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CardDto'
+      responses:
+        '200':
+          description: Обновленная карта
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardDto'
+        '404':
+          description: Карта не найдена
+    delete:
+      summary: Удалить карту по ID
+      operationId: deleteCard
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Карта удалена
+components:
+  schemas:
+    CardDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        cardNumber:
+          type: string
+        ownerName:
+          type: string
+        expirationDate:
+          type: string
+          format: date
+        status:
+          type: string
+        balance:
+          type: number
+          format: double
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - cardNumber
+        - ownerName
+        - expirationDate
+        - status

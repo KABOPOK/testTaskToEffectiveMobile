@@ -1,0 +1,67 @@
+-- Таблица пользователей
+CREATE TABLE IF NOT EXISTS users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name TEXT NOT NULL,
+    login TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL
+);
+
+-- Таблица ролей
+CREATE TABLE IF NOT EXISTS roles (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    role TEXT UNIQUE NOT NULL
+);
+
+-- Связь многие-ко-многим между пользователями и ролями
+CREATE TABLE IF NOT EXISTS user_roles (
+    user_id UUID NOT NULL,
+    role_id UUID NOT NULL,
+    PRIMARY KEY (user_id, role_id),
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_role FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE
+);
+
+-- Таблица банковских карт
+CREATE TABLE IF NOT EXISTS cards (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    card_number TEXT NOT NULL UNIQUE,
+    owner_name TEXT NOT NULL,
+    expiration_date DATE NOT NULL,
+    status TEXT NOT NULL,
+    balance NUMERIC(15, 2) DEFAULT 0.00,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    user_id UUID NOT NULL,
+    CONSTRAINT fk_card_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- ==============================
+-- Инициализация ролей и пользователей
+-- ==============================
+
+-- Добавим роли ADMIN и USER
+INSERT INTO roles (id, role) VALUES
+    (gen_random_uuid(), 'ADMIN'),
+    (gen_random_uuid(), 'USER')
+    ON CONFLICT (role) DO NOTHING;
+
+-- Создаём пользователей admin и user
+INSERT INTO users (id, name, login, password) VALUES
+    (gen_random_uuid(), 'Administrator', 'admin', 'admin123'),
+    (gen_random_uuid(), 'User', 'user', 'user123')
+    ON CONFLICT (login) DO NOTHING;
+
+-- Присвоим роли (используем подзапросы для поиска id)
+INSERT INTO user_roles (user_id, role_id)
+SELECT u.id, r.id
+FROM users u
+JOIN roles r ON r.role = 'ADMIN'
+WHERE u.login = 'admin'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO user_roles (user_id, role_id)
+SELECT u.id, r.id
+FROM users u
+JOIN roles r ON r.role = 'USER'
+WHERE u.login = 'user'
+ON CONFLICT DO NOTHING;
