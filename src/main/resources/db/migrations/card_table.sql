@@ -41,27 +41,6 @@ CREATE TABLE IF NOT EXISTS cards (
 
 -- Добавим роли ADMIN и USER
 INSERT INTO roles (id, role) VALUES
-    (gen_random_uuid(), 'ADMIN'),
-    (gen_random_uuid(), 'USER')
+    (gen_random_uuid(), 'ROLE_ADMIN'),
+    (gen_random_uuid(), 'ROLE_USER')
     ON CONFLICT (role) DO NOTHING;
-
--- Создаём пользователей admin и user
-INSERT INTO users (id, name, login, password) VALUES
-    (gen_random_uuid(), 'Administrator', 'admin', 'admin123'),
-    (gen_random_uuid(), 'User', 'user', 'user123')
-    ON CONFLICT (login) DO NOTHING;
-
--- Присвоим роли (используем подзапросы для поиска id)
-INSERT INTO user_roles (user_id, role_id)
-SELECT u.id, r.id
-FROM users u
-JOIN roles r ON r.role = 'ADMIN'
-WHERE u.login = 'admin'
-ON CONFLICT DO NOTHING;
-
-INSERT INTO user_roles (user_id, role_id)
-SELECT u.id, r.id
-FROM users u
-JOIN roles r ON r.role = 'USER'
-WHERE u.login = 'user'
-ON CONFLICT DO NOTHING;

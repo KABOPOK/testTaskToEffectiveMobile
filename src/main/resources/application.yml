@@ -21,6 +21,12 @@ spring:
     default-schema: public
     enabled: true
     drop_first: false
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
 jwt:
   secret : gfoercbeu8osf89nwxgsiyfgbowbyuefniyxeryxgfo3478n
   lifetime : 30m

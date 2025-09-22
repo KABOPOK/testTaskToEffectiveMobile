@@ -177,6 +177,8 @@ components:
     UserDto:
       type: object
       properties:
+        name:
+          type: string
         login:
           type: string
         password:

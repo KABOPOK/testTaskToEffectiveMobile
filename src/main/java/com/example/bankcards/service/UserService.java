@@ -38,17 +38,16 @@ public class UserService implements UserDetailsService {
     }
 
     public void createUser(User user) throws InstanceAlreadyExistsException {
-        User savedUser = userRepository.findById(user.getId()).orElse(null);
+        User savedUser = userRepository.findByLogin(user.getLogin()).orElse(null);
         if(savedUser != null){
             throw new InstanceAlreadyExistsException(format("user with id : %s already exists", savedUser.getId().toString()));
         }
-        user.setRoles(Set.of(roleRepository.findByRole("USER").get()));
+        user.setRoles(List.of(roleRepository.findByRole("ROLE_USER").get()));
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
 
     @Override
-    @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = getUser(username);
 
