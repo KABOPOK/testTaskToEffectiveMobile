@@ -22,4 +22,11 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleAll(Exception ex) {
+        ex.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+    }
+
 }

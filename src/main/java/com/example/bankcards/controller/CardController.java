@@ -2,16 +2,19 @@ package com.example.bankcards.controller;
 
 import generated.com.example.bankcards.api.CardsApi;
 import generated.com.example.bankcards.api.model.CardDto;
+import org.springframework.web.bind.annotation.RestController;
 
+import javax.xml.crypto.Data;
 import java.util.List;
 import java.util.UUID;
 
+@RestController
 public class CardController implements CardsApi {
 
     @Override
     public CardDto createCard(CardDto cardDto) {
         //secured data
-        return null;
+        return new CardDto("fe","m",null,"ka");
     }
 
     @Override

@@ -4,13 +4,16 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -47,16 +50,23 @@ public class JwtTokenUtils {
                 .getBody();
     }
 
-    public String getUserLogin(String token) {
+    private String getUserLogin(String token) {
         return  getClaims(token).getSubject();
     }
 
-    public Set<String> getRoles(String token) {
-        Set<?> rawRoles = getClaims(token).get("roles", Set.class);
-        if (rawRoles == null) return Set.of();
+    private List<String> getRoles(String token) {
+        List<?> rawRoles = getClaims(token).get("roles", List.class);
+        if (rawRoles == null) return List.of();
         return rawRoles.stream()
                 .filter(String.class::isInstance)
                 .map(String.class::cast)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
+    }
+
+    public UsernamePasswordAuthenticationToken getUsernamePasswordAuthenticationToken(String jwt) {
+        return new UsernamePasswordAuthenticationToken(
+                        getUserLogin(jwt),
+                        null,
+                        getRoles(jwt).stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
     }
 }
