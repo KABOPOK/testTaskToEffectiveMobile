@@ -21,3 +21,6 @@ spring:
     default-schema: public
     enabled: true
     drop_first: false
+jwt:
+  secret : gfoercbeu8osf89nwxgsiyfgbowbyuefniyxeryxgfo3478n
+  lifetime : 30m

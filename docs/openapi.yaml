@@ -5,7 +5,10 @@ info:
   version: 1.0.0
 paths:
   /cards:
+
     get:
+      tags:
+        - Cards
       summary: Получить список всех карт
       operationId: getAllCards
       responses:
@@ -18,6 +21,8 @@ paths:
                 items:
                   $ref: '#/components/schemas/CardDto'
     post:
+      tags:
+        - Cards
       summary: Создать новую карту
       operationId: createCard
       requestBody:
@@ -35,6 +40,8 @@ paths:
                 $ref: '#/components/schemas/CardDto'
   /cards/{id}:
     get:
+      tags:
+        - Cards
       summary: Получить карту по ID
       operationId: getCardById
       parameters:
@@ -54,6 +61,8 @@ paths:
         '404':
           description: Карта не найдена
     put:
+      tags:
+        - Cards
       summary: Обновить карту по ID
       operationId: updateCard
       parameters:
@@ -79,6 +88,8 @@ paths:
         '404':
           description: Карта не найдена
     delete:
+      tags:
+        - Cards
       summary: Удалить карту по ID
       operationId: deleteCard
       parameters:
@@ -91,6 +102,50 @@ paths:
       responses:
         '204':
           description: Карта удалена
+  /api/public/register:
+    post:
+      tags:
+        - User
+      summary: Регистрация нового пользователя
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDto'
+      responses:
+        '201':
+          description: Пользователь успешно зарегистрирован
+        '400':
+          description: Ошибка валидации (например, логин уже занят)
+  /api/public/auth:
+    post:
+      tags:
+        - User
+      summary: Аутентификация пользователя и получение токена
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/authDataDto'
+      responses:
+        '200':
+          description: Успешная аутентификация, возвращает JWT токен
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '401':
+          description: Неверный логин или пароль
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+
 components:
   schemas:
     CardDto:
@@ -119,3 +174,45 @@ components:
         - ownerName
         - expirationDate
         - status
+    UserDto:
+      type: object
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+      required:
+        - login
+        - password
+    authDataDto:
+      type: object
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+      required:
+        - login
+        - password
+    ApiError:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+      required:
+        - title
+        - description
+
+    ExceptionBody:
+      type: object
+      properties:
+        errors:
+          type: array
+          description: Errors list
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/ApiError'
+      required:
+        - errors
