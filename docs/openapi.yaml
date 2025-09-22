@@ -1,14 +1,13 @@
 openapi: 3.0.3
 info:
-  title: marketApi
+  title: BankApi
   description: CRUD API для управления банковскими картами
   version: 1.0.0
 paths:
-  /cards:
-
+  /api/admin/card/get_all:
     get:
       tags:
-        - Cards
+        - Card
       summary: Получить список всех карт
       operationId: getAllCards
       responses:
@@ -19,11 +18,11 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/CardDto'
-  /api/user/cards:
+                  $ref: '#/components/schemas/CardWithUserIdDto'
+  /api/admin/card/create:
     post:
       tags:
-        - Cards
+        - Card
       summary: Создать новую карту
       operationId: createCard
       requestBody:
@@ -31,18 +30,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CardDto'
+              $ref: '#/components/schemas/CardWithUserIdDto'
       responses:
         '201':
-          description: Созданная карта
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CardDto'
-  /cards/{id}:
+          description: Создана карта
+  /api/admin/card/get/{id}:
     get:
       tags:
-        - Cards
+        - Card
       summary: Получить карту по ID
       operationId: getCardById
       parameters:
@@ -58,12 +53,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CardDto'
+                $ref: '#/components/schemas/CardWithUserIdDto'
         '404':
           description: Карта не найдена
+  /api/admin/card/update/{id}:
     put:
       tags:
-        - Cards
+        - Card
       summary: Обновить карту по ID
       operationId: updateCard
       parameters:
@@ -78,19 +74,34 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CardDto'
+              $ref: '#/components/schemas/CardWithUserIdDto'
       responses:
         '200':
-          description: Обновленная карта
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CardDto'
+          description: Обновлена карта
         '404':
           description: Карта не найдена
+  /api/admin/card/block/{id}:
+    put:
+      tags:
+        - Card
+      summary: Заблокировать карту по ID
+      operationId: blockCard
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Карта успешно заблокирована
+        '404':
+          description: Карта не найдена
+  /api/admin/card/delete/{id}:
     delete:
       tags:
-        - Cards
+        - Card
       summary: Удалить карту по ID
       operationId: deleteCard
       parameters:
@@ -103,6 +114,225 @@ paths:
       responses:
         '204':
           description: Карта удалена
+  /api/user/card/get_filter_cards:
+    get:
+      tags:
+        - Card
+      summary: Получить список своих карт
+      operationId: getUserCards
+      parameters:
+        - name: page
+          in: query
+          description: Номер страницы (начинается с 0)
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          description: Количество элементов на странице
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: status
+          in: query
+          description: Статус карты
+          required: false
+          schema:
+            type: string
+            enum: [ ACTIVE, BLOCKED ]
+        - name: cardNumber
+          in: query
+          description: Часть номера карты для поиска
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Список карт с пагинацией
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CardDto'
+                  page:
+                    type: integer
+                    example: 0
+                  size:
+                    type: integer
+                    example: 10
+                  totalElements:
+                    type: integer
+                    example: 25
+                  totalPages:
+                    type: integer
+                    example: 3
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+  /api/user/card/{id}:
+    get:
+      tags:
+        - Card
+      summary: Получить карту по ID
+      operationId: getCardById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: UUID карты
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Карта найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardDto'
+        '404':
+          description: Карта не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+  /api/user/card/request_to_block/{id}:
+    put:
+      tags:
+        - Card
+      summary: Отправить запрос на блокировку карты по ID
+      operationId: requestCardBlockById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: UUID карты, которую нужно заблокировать
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Карта успешно заблокирована
+        '404':
+          description: Карта не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+  /api/user/card/balance/{id}:
+    get:
+      tags:
+        - Card
+      summary: Получить баланс карты по ID
+      operationId: getCardBalance
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: UUID карты
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Баланс карты (целое число)
+          content:
+            text/plain:
+              schema:
+                type: number
+                format: double
+                example: 1000.49
+        '404':
+          description: Карта не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+  /api/user/card/transfer:
+    put:
+      tags:
+        - Card
+      summary: Перевод средств с одной своей карты на другую
+      operationId: transferBetweenCards
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fromCardId:
+                  type: string
+                  format: uuid
+                  description: UUID карты-отправителя
+                toCardId:
+                  type: string
+                  format: uuid
+                  description: UUID карты-получателя
+                amount:
+                  type: number
+                  format: double
+                  description: Сумма перевода
+              required:
+                - fromCardId
+                - toCardId
+                - amount
+      responses:
+        '200':
+          description: Перевод успешно выполнен, возвращает новый баланс карты-отправителя
+          content:
+            text/plain:
+              schema:
+                type: number
+                format: double
+                example: 950.50
+        '400':
+          description: Ошибка перевода (недостаточно средств, неверные карты и т.д.)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '404':
+          description: Карта не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+
+
   /api/public/register:
     post:
       tags:
@@ -146,6 +376,79 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ExceptionBody'
+  /api/admin/user/create:
+    post:
+      tags:
+        - User
+      summary: Создать нового пользователя
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDto'
+      responses:
+        '201':
+          description: Пользователь успешно создан
+        '400':
+          description: Ошибка валидации входных данных
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+  /api/admin/user/update/{id}:
+    put:
+      tags:
+        - User
+      summary: Обновить данные пользователя по ID
+      operationId: updateUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDto'
+      responses:
+        '200':
+          description: Пользователь успешно обновлен
+        '404':
+          description: Пользователь не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+  /api/admin/user/block/{id}:
+    put:
+      tags:
+        - User
+      summary: Заблокировать пользователя по ID
+      operationId: blockUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Пользователь успешно заблокирован
+        '404':
+          description: Пользователь не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+
+
 
 components:
   schemas:
@@ -175,6 +478,36 @@ components:
         - ownerName
         - expirationDate
         - status
+    CardWithUserIdDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        cardNumber:
+          type: string
+        ownerName:
+          type: string
+        expirationDate:
+          type: string
+          format: date
+        status:
+          type: string
+        balance:
+          type: number
+          format: double
+        createdAt:
+          type: string
+          format: date-time
+        userId:
+          type: string
+          format: uuid
+      required:
+        - cardNumber
+        - ownerName
+        - expirationDate
+        - status
+        - userId
     UserDto:
       type: object
       properties:

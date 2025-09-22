@@ -28,5 +28,5 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 
 jwt:
-  secret : gfoercbeu8osf89nwxgsiyfgbowbyuefniyxeryxgfo3478n
+  secret : PandyachyaPanda
   lifetime : 30m
