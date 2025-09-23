@@ -4,10 +4,11 @@ info:
   description: CRUD API для управления банковскими картами
   version: 1.0.0
 paths:
+  # --- Admin Card Controller ---
   /api/admin/card/get_all:
     get:
       tags:
-        - Card
+        - Admin-Card
       summary: Получить список всех карт
       operationId: getAllCards
       responses:
@@ -22,7 +23,7 @@ paths:
   /api/admin/card/create:
     post:
       tags:
-        - Card
+        - Admin-Card
       summary: Создать новую карту
       operationId: createCard
       requestBody:
@@ -37,7 +38,7 @@ paths:
   /api/admin/card/get/{id}:
     get:
       tags:
-        - Card
+        - Admin-Card
       summary: Получить карту по ID
       operationId: getCardById
       parameters:
@@ -59,7 +60,7 @@ paths:
   /api/admin/card/update/{id}:
     put:
       tags:
-        - Card
+        - Admin-Card
       summary: Обновить карту по ID
       operationId: updateCard
       parameters:
@@ -83,7 +84,7 @@ paths:
   /api/admin/card/block/{id}:
     put:
       tags:
-        - Card
+        - Admin-Card
       summary: Заблокировать карту по ID
       operationId: blockCard
       parameters:
@@ -101,7 +102,7 @@ paths:
   /api/admin/card/delete/{id}:
     delete:
       tags:
-        - Card
+        - Admin-Card
       summary: Удалить карту по ID
       operationId: deleteCard
       parameters:
@@ -114,38 +115,47 @@ paths:
       responses:
         '204':
           description: Карта удалена
+  /api/admin/card/get_to_block:
+    get:
+      tags:
+        - Admin-Card
+      summary: Получить список карт, ожидающих блокировки (со статусом TO_BLOCK)
+      operationId: getCardsToBlock
+      responses:
+        '200':
+          description: Список карт со статусом TO_BLOCK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CardWithUserIdDto'
+
+  # --- User Card Controller ---
   /api/user/card/get_filter_cards:
     get:
       tags:
-        - Card
+        - User-Card
       summary: Получить список своих карт
-      operationId: getUserCards
+      operationId: getCards
       parameters:
         - name: page
           in: query
-          description: Номер страницы (начинается с 0)
-          required: false
           schema:
             type: integer
             default: 0
         - name: size
           in: query
-          description: Количество элементов на странице
-          required: false
           schema:
             type: integer
             default: 10
         - name: status
           in: query
-          description: Статус карты
-          required: false
           schema:
             type: string
-            enum: [ ACTIVE, BLOCKED ]
+            enum: [ ACTIVE, BLOCKED, TO_BLOCK ]
         - name: cardNumber
           in: query
-          description: Часть номера карты для поиска
-          required: false
           schema:
             type: string
       responses:
@@ -181,14 +191,13 @@ paths:
   /api/user/card/{id}:
     get:
       tags:
-        - Card
+        - User-Card
       summary: Получить карту по ID
       operationId: getCardById
       parameters:
         - name: id
           in: path
           required: true
-          description: UUID карты
           schema:
             type: string
             format: uuid
@@ -201,62 +210,44 @@ paths:
                 $ref: '#/components/schemas/CardDto'
         '404':
           description: Карта не найдена
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ExceptionBody'
         '401':
           description: Не авторизован
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ExceptionBody'
   /api/user/card/request_to_block/{id}:
     put:
       tags:
-        - Card
-      summary: Отправить запрос на блокировку карты по ID
-      operationId: requestCardBlockById
+        - User-Card
+      summary: Отправить запрос на блокировку карты
+      operationId: requestCardBlock
       parameters:
         - name: id
           in: path
           required: true
-          description: UUID карты, которую нужно заблокировать
           schema:
             type: string
             format: uuid
       responses:
         '200':
-          description: Карта успешно заблокирована
+          description: Запрос на блокировку отправлен
         '404':
           description: Карта не найдена
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ExceptionBody'
         '401':
           description: Не авторизован
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ExceptionBody'
   /api/user/card/balance/{id}:
     get:
       tags:
-        - Card
+        - User-Card
       summary: Получить баланс карты по ID
       operationId: getCardBalance
       parameters:
         - name: id
           in: path
           required: true
-          description: UUID карты
           schema:
             type: string
             format: uuid
       responses:
         '200':
-          description: Баланс карты (целое число)
+          description: Баланс карты
           content:
             text/plain:
               schema:
@@ -265,21 +256,13 @@ paths:
                 example: 1000.49
         '404':
           description: Карта не найдена
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ExceptionBody'
         '401':
           description: Не авторизован
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ExceptionBody'
   /api/user/card/transfer:
     put:
       tags:
-        - Card
-      summary: Перевод средств с одной своей карты на другую
+        - User-Card
+      summary: Перевод средств между картами
       operationId: transferBetweenCards
       requestBody:
         required: true
@@ -291,22 +274,19 @@ paths:
                 fromCardId:
                   type: string
                   format: uuid
-                  description: UUID карты-отправителя
                 toCardId:
                   type: string
                   format: uuid
-                  description: UUID карты-получателя
                 amount:
                   type: number
                   format: double
-                  description: Сумма перевода
               required:
                 - fromCardId
                 - toCardId
                 - amount
       responses:
         '200':
-          description: Перевод успешно выполнен, возвращает новый баланс карты-отправителя
+          description: Перевод успешно выполнен
           content:
             text/plain:
               schema:
@@ -314,29 +294,17 @@ paths:
                 format: double
                 example: 950.50
         '400':
-          description: Ошибка перевода (недостаточно средств, неверные карты и т.д.)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ExceptionBody'
+          description: Ошибка перевода
         '401':
           description: Не авторизован
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ExceptionBody'
         '404':
           description: Карта не найдена
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ExceptionBody'
 
-
-  /api/public/register:
+  # --- Auth Controller ---
+  /api/public/user/register:
     post:
       tags:
-        - User
+        - Auth
       summary: Регистрация нового пользователя
       operationId: registerUser
       requestBody:
@@ -347,14 +315,14 @@ paths:
               $ref: '#/components/schemas/UserDto'
       responses:
         '201':
-          description: Пользователь успешно зарегистрирован
+          description: Пользователь зарегистрирован
         '400':
-          description: Ошибка валидации (например, логин уже занят)
-  /api/public/auth:
+          description: Ошибка валидации
+  /api/public/user/auth:
     post:
       tags:
-        - User
-      summary: Аутентификация пользователя и получение токена
+        - Auth
+      summary: Аутентификация и получение токена
       operationId: loginUser
       requestBody:
         required: true
@@ -364,22 +332,19 @@ paths:
               $ref: '#/components/schemas/authDataDto'
       responses:
         '200':
-          description: Успешная аутентификация, возвращает JWT токен
+          description: JWT токен
           content:
             text/plain:
               schema:
                 type: string
-                example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         '401':
           description: Неверный логин или пароль
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ExceptionBody'
+
+  # --- Admin User Controller ---
   /api/admin/user/create:
     post:
       tags:
-        - User
+        - Admin-User
       summary: Создать нового пользователя
       operationId: createUser
       requestBody:
@@ -390,18 +355,14 @@ paths:
               $ref: '#/components/schemas/UserDto'
       responses:
         '201':
-          description: Пользователь успешно создан
+          description: Пользователь создан
         '400':
-          description: Ошибка валидации входных данных
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ExceptionBody'
+          description: Ошибка валидации
   /api/admin/user/update/{id}:
     put:
       tags:
-        - User
-      summary: Обновить данные пользователя по ID
+        - Admin-User
+      summary: Обновить данные пользователя
       operationId: updateUser
       parameters:
         - name: id
@@ -418,18 +379,14 @@ paths:
               $ref: '#/components/schemas/UserDto'
       responses:
         '200':
-          description: Пользователь успешно обновлен
+          description: Пользователь обновлен
         '404':
           description: Пользователь не найден
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ExceptionBody'
   /api/admin/user/block/{id}:
     put:
       tags:
-        - User
-      summary: Заблокировать пользователя по ID
+        - Admin-User
+      summary: Заблокировать пользователя
       operationId: blockUser
       parameters:
         - name: id
@@ -440,15 +397,9 @@ paths:
             format: uuid
       responses:
         '200':
-          description: Пользователь успешно заблокирован
+          description: Пользователь заблокирован
         '404':
           description: Пользователь не найден
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ExceptionBody'
-
-
 
 components:
   schemas:
@@ -540,14 +491,11 @@ components:
       required:
         - title
         - description
-
     ExceptionBody:
       type: object
       properties:
         errors:
           type: array
-          description: Errors list
-          minItems: 1
           items:
             $ref: '#/components/schemas/ApiError'
       required:

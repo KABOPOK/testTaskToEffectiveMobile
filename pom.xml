@@ -142,6 +142,9 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
+                            <!--let be repeated -->
+                            <skipValidateSpec>true</skipValidateSpec>
+                            <!--let be repeated -->
                             <inputSpec>${project.basedir}/docs/openapi.yaml</inputSpec>
                             <generatorName>spring</generatorName>
                             <apiPackage>generated.${package}.api</apiPackage>

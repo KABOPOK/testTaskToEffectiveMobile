@@ -3,12 +3,7 @@ package com.example.bankcards.service;
 import com.example.bankcards.entity.User;
 import com.example.bankcards.repository.RoleRepository;
 import com.example.bankcards.repository.UserRepository;
-import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -17,14 +12,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import static java.lang.String.format;
-import javax.management.InstanceAlreadyExistsException;
+
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static java.lang.String.format;
 @Service
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
@@ -37,10 +28,10 @@ public class UserService implements UserDetailsService {
         return userRepository.findByLogin(login).orElseThrow(()-> new UsernameNotFoundException(login));
     }
 
-    public void createUser(User user) throws InstanceAlreadyExistsException {
+    public void createUser(User user) {
         User savedUser = userRepository.findByLogin(user.getLogin()).orElse(null);
         if(savedUser != null){
-            throw new InstanceAlreadyExistsException(format("user with id : %s already exists", savedUser.getId().toString()));
+            throw new UserAlreadyExistsException(user.getLogin());
         }
         user.setRoles(List.of(roleRepository.findByRole("ROLE_USER").get()));
         user.setPassword(passwordEncoder.encode(user.getPassword()));
