@@ -26,7 +26,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         ExceptionBody body = new ExceptionBody(
                 List.of(new ApiError("AuthenticationFailed", "You are not authenticated or Wrong password/login"))
         );
-
+        authException.printStackTrace();
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.getWriter().write(objectMapper.writeValueAsString(body));

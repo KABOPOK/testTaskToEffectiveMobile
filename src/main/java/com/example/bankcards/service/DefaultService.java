@@ -12,10 +12,11 @@ import static java.lang.String.format;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class DefaultService {
 
-  private static final String NOT_FOUND = "Entity with id %s not found";
+  protected static final String ENTITY_NOT_FOUND = "Entity with id %s not found";
+  protected static final String ENTITY_ALREADY_EXIST = "Entity with id %s already exists";
 
   protected static  <T> T getOrThrow(UUID id, Function<UUID, Optional<T>> function) {
-    return function.apply(id).orElseThrow(() -> new EntityNotFoundException(format(NOT_FOUND, id)));
+    return function.apply(id).orElseThrow(() -> new EntityNotFoundException(format(ENTITY_NOT_FOUND, id)));
   }
 
 

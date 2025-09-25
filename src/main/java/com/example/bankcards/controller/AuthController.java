@@ -38,10 +38,4 @@ public class AuthController implements AuthApi {
         userService.createUser(user);
     }
 
-
-    @GetMapping("/get")
-    public String test() {
-        return "Hello! Endpoint is public 🚀";
-    }
-
 }

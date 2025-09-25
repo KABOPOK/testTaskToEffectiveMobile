@@ -1,4 +1,4 @@
-package com.example.bankcards.config;
+package com.example.bankcards.security;
 
 import com.example.bankcards.util.JwtTokenUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;

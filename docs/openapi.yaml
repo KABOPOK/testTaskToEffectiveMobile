@@ -5,21 +5,6 @@ info:
   version: 1.0.0
 paths:
   # --- Admin Card Controller ---
-  /api/admin/card/get_all:
-    get:
-      tags:
-        - Admin-Card
-      summary: Получить список всех карт
-      operationId: getAllCards
-      responses:
-        '200':
-          description: Список карт
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CardWithUserIdDto'
   /api/admin/card/create:
     post:
       tags:
@@ -121,6 +106,21 @@ paths:
         - Admin-Card
       summary: Получить список карт, ожидающих блокировки (со статусом TO_BLOCK)
       operationId: getCardsToBlock
+      parameters:
+        - name: page
+          in: query
+          description: Номер страницы (начинается с 0)
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          description: Количество элементов на странице
+          required: false
+          schema:
+            type: integer
+            default: 10
       responses:
         '200':
           description: Список карт со статусом TO_BLOCK
@@ -130,6 +130,39 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CardWithUserIdDto'
+
+  /api/admin/card/get_all:
+    get:
+      tags:
+        - Admin-Card
+      summary: Получить список всех карт
+      operationId: getAllCards
+      parameters:
+        - name: page
+          in: query
+          description: Номер страницы (начинается с 0)
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          description: Количество элементов на странице
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Список карт
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CardWithUserIdDto'
+
+
 
   # --- User Card Controller ---
   /api/user/card/get_filter_cards:
@@ -400,6 +433,29 @@ paths:
           description: Пользователь заблокирован
         '404':
           description: Пользователь не найден
+  /api/admin/user/get/{id}:
+    put:
+      tags:
+        - Admin-User
+      summary: Заблокировать пользователя
+      operationId: getUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Пользователь найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+
+        '404':
+          description: Пользователь не найден
 
 components:
   schemas:
@@ -435,6 +491,7 @@ components:
         id:
           type: string
           format: uuid
+          readOnly: true
         cardNumber:
           type: string
         ownerName:
@@ -450,6 +507,7 @@ components:
         createdAt:
           type: string
           format: date-time
+          readOnly: true
         userId:
           type: string
           format: uuid
