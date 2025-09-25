@@ -1,8 +1,13 @@
 package com.example.bankcards.util;
 
+import com.example.bankcards.entity.User;
+import com.example.bankcards.exception.EntityBlockedException;
+import com.example.bankcards.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,13 +23,18 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
+
 @Component
+@RequiredArgsConstructor
 public class JwtTokenUtils {
     @Value("${jwt.secret}")
     private String secret;
 
     @Value("${jwt.lifetime}")
     private Duration lifetime;
+
+    private final UserRepository userRepository;
 
     public String generateToken(UserDetails userDetails) {
 
@@ -43,15 +53,15 @@ public class JwtTokenUtils {
                 .compact();
     }
 
-    private Claims getClaims(String token) {
+    private Claims getClaims(String jwt) {
         return Jwts.parser()
                 .setSigningKey(secret)
-                .parseClaimsJws(token)
+                .parseClaimsJws(jwt)
                 .getBody();
     }
 
-    private String getUserLogin(String token) {
-        return  getClaims(token).getSubject();
+    private String getUserLogin(String jwt) {
+        return  getClaims(jwt).getSubject();
     }
 
     private List<String> getRoles(String token) {
@@ -64,9 +74,14 @@ public class JwtTokenUtils {
     }
 
     public UsernamePasswordAuthenticationToken getUsernamePasswordAuthenticationToken(String jwt) {
-        return new UsernamePasswordAuthenticationToken(
-                        getUserLogin(jwt),
-                        null,
-                        getRoles(jwt).stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
+        String login = getUserLogin(jwt);
+        User savedUser = userRepository.findByLogin(login).orElseThrow(
+                () -> new EntityNotFoundException(format("Entity with id %s not found", login))
+        );
+        if(savedUser.getStatus().equals("BLOCKED")){
+            throw new EntityBlockedException(format("entity with id %s is BLOCKED", savedUser.getId()));
+        }
+        return new UsernamePasswordAuthenticationToken(login, null,
+                getRoles(jwt).stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
     }
 }

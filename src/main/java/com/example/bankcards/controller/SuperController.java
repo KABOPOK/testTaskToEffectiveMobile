@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
@@ -32,6 +33,9 @@ public class SuperController {
             admin.setPassword(passwordEncoder.encode("supersecret"));
             admin.setName("Super Admin");
             admin.setRoles(List.of(roleRepository.findByRole("ROLE_ADMIN").get()));
+            admin.setCreatedAt(Instant.now());
+            admin.setUpdatedAt(Instant.now());
+            admin.setStatus("ACTIVE");
             userRepository.save(admin);
         }
         UserDetails userDetails = userService.loadUserByUsername(admin.getLogin());

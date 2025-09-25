@@ -130,7 +130,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CardWithUserIdDto'
-
   /api/admin/card/get_all:
     get:
       tags:
@@ -162,7 +161,90 @@ paths:
                 items:
                   $ref: '#/components/schemas/CardWithUserIdDto'
 
+  # --- Admin User Controller ---
+  /api/admin/user/update/{id}:
+    put:
+      tags:
+        - Admin-User
+      summary: Обновить данные пользователя
+      operationId: updateUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserAdminUpdateDto'
+      responses:
+        '200':
+          description: Пользователь обновлен
+        '404':
+          description: Пользователь не найден
+  /api/admin/user/block/{id}:
+    put:
+      tags:
+        - Admin-User
+      summary: Заблокировать пользователя
+      operationId: blockUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Пользователь заблокирован
+        '404':
+          description: Пользователь не найден
+  /api/admin/user/get/{id}:
+    get:
+      tags:
+        - Admin-User
+      summary: Заблокировать пользователя
+      operationId: getUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Пользователь найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
 
+        '404':
+          description: Пользователь не найден
+  /api/admin/user/delete/{id}:
+    delete:
+      tags:
+        - Admin-User
+      summary: Удалить пользователя
+      operationId: deleteUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Пользователь заблокирован
+        '404':
+          description: Пользователь не найден
 
   # --- User Card Controller ---
   /api/user/card/get_filter_cards:
@@ -367,95 +449,21 @@ paths:
         '200':
           description: JWT токен
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/tokenDto'
         '401':
           description: Неверный логин или пароль
-
-  # --- Admin User Controller ---
-  /api/admin/user/create:
-    post:
-      tags:
-        - Admin-User
-      summary: Создать нового пользователя
-      operationId: createUser
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserDto'
-      responses:
-        '201':
-          description: Пользователь создан
-        '400':
-          description: Ошибка валидации
-  /api/admin/user/update/{id}:
-    put:
-      tags:
-        - Admin-User
-      summary: Обновить данные пользователя
-      operationId: updateUser
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserDto'
-      responses:
-        '200':
-          description: Пользователь обновлен
-        '404':
-          description: Пользователь не найден
-  /api/admin/user/block/{id}:
-    put:
-      tags:
-        - Admin-User
-      summary: Заблокировать пользователя
-      operationId: blockUser
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Пользователь заблокирован
-        '404':
-          description: Пользователь не найден
-  /api/admin/user/get/{id}:
-    put:
-      tags:
-        - Admin-User
-      summary: Заблокировать пользователя
-      operationId: getUser
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Пользователь найден
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserDto'
-
-        '404':
-          description: Пользователь не найден
+                $ref: '#/components/schemas/ExceptionBody'
+        '403':
+          description: Пользователь Заблокирован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
 
 components:
   schemas:
@@ -480,6 +488,10 @@ components:
         createdAt:
           type: string
           format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
       required:
         - cardNumber
         - ownerName
@@ -508,6 +520,10 @@ components:
           type: string
           format: date-time
           readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
         userId:
           type: string
           format: uuid
@@ -517,15 +533,62 @@ components:
         - expirationDate
         - status
         - userId
-    UserDto:
+    UserAdminUpdateDto:
       type: object
       properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
         name:
           type: string
         login:
           type: string
         password:
           type: string
+          writeOnly: true
+        status:
+          type: string
+          enum: [ ACTIVE, BLOCKED ]
+        roles:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+    UserDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+        login:
+          type: string
+        status:
+          type: string
+          enum: [ ACTIVE, BLOCKED ]
+          readOnly: true
+        roles:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
       required:
         - login
         - password
@@ -539,6 +602,11 @@ components:
       required:
         - login
         - password
+    tokenDto:
+      type: object
+      properties:
+        token:
+          type: string
     ApiError:
       type: object
       properties:

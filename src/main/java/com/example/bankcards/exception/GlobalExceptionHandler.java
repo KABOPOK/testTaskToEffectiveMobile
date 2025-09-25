@@ -32,6 +32,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
 
+    @ExceptionHandler(EntityBlockedException.class)
+    public ResponseEntity<ExceptionBody> handleEntityBlockedException(EntityBlockedException ex) {
+        ExceptionBody body = new ExceptionBody(
+                List.of(new ApiError("Entity blocked", ex.getMessage()))
+        );
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleAll(Exception ex) {
         ex.printStackTrace();

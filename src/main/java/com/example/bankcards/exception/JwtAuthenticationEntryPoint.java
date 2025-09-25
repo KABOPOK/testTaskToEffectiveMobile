@@ -6,6 +6,7 @@ import generated.com.example.bankcards.api.model.ExceptionBody;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -22,7 +23,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request,
                          HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
-
+        if(authException instanceof DisabledException){return;}
         ExceptionBody body = new ExceptionBody(
                 List.of(new ApiError("AuthenticationFailed", "You are not authenticated or Wrong password/login"))
         );
