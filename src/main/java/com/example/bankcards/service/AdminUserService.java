@@ -1,16 +1,12 @@
 package com.example.bankcards.service;
 
 import com.example.bankcards.entity.User;
-import com.example.bankcards.exception.EntityBlockedException;
 import com.example.bankcards.repository.RoleRepository;
 import com.example.bankcards.repository.UserRepository;
-import com.example.bankcards.util.JwtTokenUtils;
+import generated.com.example.bankcards.api.model.UserDto;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -28,7 +24,7 @@ import static java.lang.String.format;
 
 @Service
 @RequiredArgsConstructor
-public class UserService extends DefaultService implements UserDetailsService {
+public class AdminUserService extends DefaultService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -75,12 +71,12 @@ public class UserService extends DefaultService implements UserDetailsService {
 
     public void updateUser(UUID id, User updatedUser) {
         User savedUser = getOrThrow(id, userRepository::findById);
-        updatedUser.setId(savedUser.getId());
-        updatedUser.setStatus("ACTIVE");
-        updatedUser.setCreatedAt(savedUser.getCreatedAt());
-        updatedUser.setUpdatedAt(Instant.now());
-        updatedUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
-        userRepository.save(updatedUser);
+        savedUser.setStatus("ACTIVE");
+        savedUser.setUpdatedAt(Instant.now());
+        savedUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+        savedUser.setName(updatedUser.getName());
+        savedUser.setLogin(updatedUser.getLogin());
+        userRepository.save(savedUser);
     }
 
     public void deleteUser(UUID id) {
@@ -88,4 +84,7 @@ public class UserService extends DefaultService implements UserDetailsService {
         userRepository.delete(savedUser);
     }
 
+    public List<User> getUsers() {
+        return userRepository.findAll();
+    }
 }

@@ -16,18 +16,18 @@ import static java.lang.String.format;
 public class AuthService {
 
     private final AuthenticationManager authenticationManager;
-    private final UserService userService;
+    private final AdminUserService adminUserService;
     private final JwtTokenUtils jwtTokenUtils;
 
     public String getToken(User user) {
-        User savedUser = userService.getUser(user.getLogin());
+        User savedUser = adminUserService.getUser(user.getLogin());
         if(savedUser.getStatus().equals("BLOCKED")){
             throw new EntityBlockedException(format("entity with id %s is BLOCKED", savedUser.getId()));
         }
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(user.getLogin(), user.getPassword())
         );
-        UserDetails userDetails = userService.loadUserByUsername(user.getLogin());
+        UserDetails userDetails = adminUserService.loadUserByUsername(user.getLogin());
         return jwtTokenUtils.generateToken(userDetails);
     }
 }

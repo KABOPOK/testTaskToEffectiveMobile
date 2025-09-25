@@ -227,6 +227,27 @@ paths:
 
         '404':
           description: Пользователь не найден
+  /api/admin/user/get_all_users:
+    get:
+      tags:
+        - Admin-User
+      summary: Получить всех пользователей
+      operationId: getAllUsers
+      responses:
+        '200':
+          description: Список пользователей
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserDto'
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
   /api/admin/user/delete/{id}:
     delete:
       tags:
@@ -247,7 +268,7 @@ paths:
           description: Пользователь не найден
 
   # --- User Card Controller ---
-  /api/user/card/get_filter_cards:
+  /api/user/card/get_cards_by_number:
     get:
       tags:
         - User-Card
@@ -264,41 +285,33 @@ paths:
           schema:
             type: integer
             default: 10
-        - name: status
-          in: query
-          schema:
-            type: string
-            enum: [ ACTIVE, BLOCKED, TO_BLOCK ]
         - name: cardNumber
           in: query
           schema:
             type: string
       responses:
         '200':
-          description: Список карт с пагинацией
+          description: Список карт
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  content:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/CardDto'
-                  page:
-                    type: integer
-                    example: 0
-                  size:
-                    type: integer
-                    example: 10
-                  totalElements:
-                    type: integer
-                    example: 25
-                  totalPages:
-                    type: integer
-                    example: 3
+                type: array
+                items:
+                  $ref: '#/components/schemas/CardDto'
+        '404':
+          description: Карта не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
         '401':
           description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '403':
+          description: Отказ доступа
           content:
             application/json:
               schema:
@@ -325,8 +338,22 @@ paths:
                 $ref: '#/components/schemas/CardDto'
         '404':
           description: Карта не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
         '401':
           description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '403':
+          description: Отказ доступа
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
   /api/user/card/request_to_block/{id}:
     put:
       tags:
@@ -345,8 +372,22 @@ paths:
           description: Запрос на блокировку отправлен
         '404':
           description: Карта не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
         '401':
           description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '403':
+          description: Отказ доступа
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
   /api/user/card/balance/{id}:
     get:
       tags:
@@ -357,6 +398,7 @@ paths:
         - name: id
           in: path
           required: true
+          description: ID карты
           schema:
             type: string
             format: uuid
@@ -364,15 +406,27 @@ paths:
         '200':
           description: Баланс карты
           content:
-            text/plain:
+            application/json:
               schema:
-                type: number
-                format: double
-                example: 1000.49
+                $ref: '#/components/schemas/BalanceDto'
         '404':
           description: Карта не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
         '401':
           description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '403':
+          description: Отказ доступа
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
   /api/user/card/transfer:
     put:
       tags:
@@ -384,36 +438,28 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                fromCardId:
-                  type: string
-                  format: uuid
-                toCardId:
-                  type: string
-                  format: uuid
-                amount:
-                  type: number
-                  format: double
-              required:
-                - fromCardId
-                - toCardId
-                - amount
+              $ref: '#/components/schemas/TransferDataDto'
       responses:
-        '200':
+        '201':
           description: Перевод успешно выполнен
-          content:
-            text/plain:
-              schema:
-                type: number
-                format: double
-                example: 950.50
-        '400':
-          description: Ошибка перевода
-        '401':
-          description: Не авторизован
         '404':
           description: Карта не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '403':
+          description: Отказ доступа
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
 
   # --- Auth Controller ---
   /api/public/user/register:
@@ -466,7 +512,7 @@ paths:
                 $ref: '#/components/schemas/ExceptionBody'
 
 components:
-  schemas:
+   schemas:
     CardDto:
       type: object
       properties:
@@ -626,3 +672,27 @@ components:
             $ref: '#/components/schemas/ApiError'
       required:
         - errors
+    BalanceDto:
+      type: object
+      properties:
+        balance:
+          type: string
+          format: bigdecimal
+    TransferDataDto:
+      type: object
+      properties:
+        fromCardId:
+          type: string
+          format: uuid
+        toCardId:
+          type: string
+          format: uuid
+        amount:
+          type: number
+          format: double
+      required:
+        - fromCardId
+        - toCardId
+        - amount
+
+

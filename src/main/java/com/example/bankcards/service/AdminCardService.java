@@ -1,12 +1,9 @@
 package com.example.bankcards.service;
 
 import com.example.bankcards.entity.Card;
-import com.example.bankcards.entity.User;
 import com.example.bankcards.repository.CardRepository;
-import com.example.bankcards.repository.UserRepository;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,7 +17,7 @@ import static java.lang.String.format;
 
 @Service
 @RequiredArgsConstructor
-public class CardService extends DefaultService {
+public class AdminCardService extends DefaultService {
     private final CardRepository cardRepository;
 
     public void blockCard(UUID id) {
@@ -69,8 +66,4 @@ public class CardService extends DefaultService {
         return getOrThrow(id, cardRepository::findById);
     }
 
-    public Card getCard(String cardNumber) {
-        return cardRepository.findByCardNumber(cardNumber).
-                orElseThrow(() -> new EntityNotFoundException(format("Entity with card number %s not found", cardNumber)));
-    }
 }

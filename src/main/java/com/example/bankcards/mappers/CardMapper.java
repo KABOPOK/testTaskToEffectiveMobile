@@ -9,6 +9,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring",uses = CardMapperHelper.class)
 public interface CardMapper {
     Card map (CardDto cardDto);
+    CardDto mapToCardDto (Card card);
     @Mapping(target = "user", source = "userId")
     Card map (CardWithUserIdDto cardWithUserIdDto);
     CardWithUserIdDto map (Card card);

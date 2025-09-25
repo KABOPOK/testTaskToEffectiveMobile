@@ -5,6 +5,7 @@ import generated.com.example.bankcards.api.model.ExceptionBody;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -36,6 +37,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ExceptionBody> handleEntityBlockedException(EntityBlockedException ex) {
         ExceptionBody body = new ExceptionBody(
                 List.of(new ApiError("Entity blocked", ex.getMessage()))
+        );
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ExceptionBody> handleAccessDeniedException(AccessDeniedException ex) {
+        ExceptionBody body = new ExceptionBody(
+                List.of(new ApiError("Access denied", ex.getMessage()))
         );
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
     }
