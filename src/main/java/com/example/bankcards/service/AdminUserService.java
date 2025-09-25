@@ -43,7 +43,7 @@ public class AdminUserService extends DefaultService implements UserDetailsServi
     public void createUser(User user) {
         User savedUser = userRepository.findByLogin(user.getLogin()).orElse(null);
         if(savedUser != null){
-            throw new EntityExistsException(user.getLogin());
+            throw new EntityExistsException(format("User with id %s already exist", user.getLogin()));
         }
         user.setRoles(List.of(roleRepository.findByRole("ROLE_USER").get()));
         user.setStatus("ACTIVE");

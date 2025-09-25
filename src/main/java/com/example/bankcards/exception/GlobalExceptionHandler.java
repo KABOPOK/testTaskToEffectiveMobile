@@ -2,6 +2,7 @@ package com.example.bankcards.exception;
 
 import generated.com.example.bankcards.api.model.ApiError;
 import generated.com.example.bankcards.api.model.ExceptionBody;
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +18,8 @@ import java.util.List;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(InstanceAlreadyExistsException.class)
-    public ResponseEntity<ExceptionBody> handleInstanceAlreadyExists(InstanceAlreadyExistsException ex) {
+    @ExceptionHandler(EntityExistsException.class)
+    public ResponseEntity<ExceptionBody> handleEntityExistsException(EntityExistsException ex) {
         ExceptionBody body = new ExceptionBody(
                 List.of(new ApiError("AlreadyExists", ex.getMessage()))
         );
