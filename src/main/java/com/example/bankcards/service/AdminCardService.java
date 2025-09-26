@@ -25,7 +25,7 @@ public class AdminCardService extends DefaultService {
 
     public void blockCard(UUID id) {
         Card card = getOrThrow(id, cardRepository::findById);
-        card.setStatus("BLOKED");
+        card.setStatus("BLOСKED");
         card.setUpdatedAt(Instant.now());
         cardRepository.save(card);
     }
