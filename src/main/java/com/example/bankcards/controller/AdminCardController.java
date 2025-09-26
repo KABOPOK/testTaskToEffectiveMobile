@@ -27,6 +27,7 @@ public class AdminCardController implements AdminCardApi {
     @Override
     public void createCard(CardWithUserIdDto cardWithUserIdDto) {
         Card card = cardMapper.map(cardWithUserIdDto);
+        card.setCardBin(card.getCardNumber().substring(0,6));
         adminCardService.createCard(card);
     }
 

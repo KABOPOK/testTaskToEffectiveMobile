@@ -1,11 +1,15 @@
 package com.example.bankcards.config;
-
-import com.example.bankcards.exception.JwtAuthenticationEntryPoint;
 import com.example.bankcards.security.JwtFilter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import generated.com.example.bankcards.api.model.ApiError;
+import generated.com.example.bankcards.api.model.ExceptionBody;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -18,13 +22,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.List;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
-    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtFilter jwtFilter;
 
     @Bean
@@ -54,7 +59,23 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                        .authenticationEntryPoint((request, response, accessDeniedException) -> {
+                            if(accessDeniedException instanceof DisabledException){return;}
+                            ExceptionBody body = new ExceptionBody(
+                                    List.of(new ApiError("AuthenticationFailed", "Wrong JWT token"))
+                            );
+                            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.getWriter().write((new ObjectMapper().writeValueAsString(body)));
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            ExceptionBody body = new ExceptionBody(
+                                    List.of(new ApiError("AccessDenied", "You don’t have permission to access this resource"))
+                            );
+                            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                            response.getWriter().write(new ObjectMapper().writeValueAsString(body));
+                        })
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

@@ -17,4 +17,5 @@ public interface UserMapper {
     @Mapping(target = "roles", source = "roles")
     User mapFromUserAdminDto(UserAdminUpdateDto userAdminUpdateDto);
     User mapFromAuthData(AuthDataDto authDataDto);
+    User map(AuthDataDto authDataDto);
 }

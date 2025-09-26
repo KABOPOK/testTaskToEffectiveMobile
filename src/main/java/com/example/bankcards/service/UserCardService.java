@@ -4,6 +4,7 @@ import com.example.bankcards.entity.Card;
 import com.example.bankcards.entity.User;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.repository.UserRepository;
+import com.example.bankcards.security.CardEncryptor;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -27,6 +28,7 @@ import static java.lang.String.format;
 public class UserCardService extends DefaultService {
     private final UserRepository userRepository;
     private final CardRepository cardRepository;
+    private final CardEncryptor cardEncryptor;
 
     private void doesCardBelongToUser(Card card, User user){
         if(!user.getId().equals(card.getUser().getId())){
@@ -38,7 +40,7 @@ public class UserCardService extends DefaultService {
 
     private void doesCardBlocked(Card card){
         if(!card.getStatus().equals("ACTIVE")){
-            throw new AccessDeniedException(format("The card with id %s is blocked", card.getId()));
+            throw new AccessDeniedException(format("The status of card with id %s is %s", card.getId(), card.getStatus()));
         }
     }
 
@@ -61,18 +63,14 @@ public class UserCardService extends DefaultService {
         User user = getCurrentUser();
         doesCardBlocked(card);
         doesCardBelongToUser(card, user);
+        cardEncryptor.decryptCardAndHidden(card);
         return card;
     }
 
     public List<Card> getCardsByCardNumber(Integer page, Integer size, String cardNumber) {
-        Card card = cardRepository.findByCardNumber(cardNumber).orElseThrow(
-                () -> new EntityNotFoundException(format("Card with cardNumber %s not exist", cardNumber)));
         User user = getCurrentUser();
-        doesCardBelongToUser(card, user);
-        doesCardBlocked(card);
-
         Pageable pageable = PageRequest.of(page, size);
-        Page<Card> pageOfCards = cardRepository.findAllByCardNumberStartingWithAndUser(cardNumber, user, pageable);
+        Page<Card> pageOfCards = cardRepository.findAllByCardNumberStartingWithAndUser(cardNumber, user, pageable).map(cardEncryptor::decryptCardAndHidden);
         return pageOfCards.getContent();
     }
 

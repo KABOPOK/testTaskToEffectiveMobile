@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS user_roles (
 CREATE TABLE IF NOT EXISTS cards (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     card_number TEXT NOT NULL UNIQUE,
+    card_bin TEXT NOT NULL,
     owner_name TEXT NOT NULL,
     expiration_date DATE NOT NULL,
     status TEXT NOT NULL,

@@ -728,13 +728,17 @@ components:
           type: string
         login:
           type: string
+        password:
+          type: string
         status:
           type: string
           enum: [ ACTIVE, BLOCKED ]
           readOnly: true
         roles:
+          readOnly: true
           type: array
           items:
+            readOnly: true
             type: string
         createdAt:
           type: string
@@ -746,6 +750,7 @@ components:
           readOnly: true
       required:
         - login
+        - name
         - password
     authDataDto:
       type: object

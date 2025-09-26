@@ -1,7 +1,9 @@
 package com.example.bankcards.service;
 
 import com.example.bankcards.entity.Card;
+import com.example.bankcards.mappers.CardMapper;
 import com.example.bankcards.repository.CardRepository;
+import com.example.bankcards.security.CardEncryptor;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ import static java.lang.String.format;
 @RequiredArgsConstructor
 public class AdminCardService extends DefaultService {
     private final CardRepository cardRepository;
+    private final CardEncryptor cardEncryptor;
 
     public void blockCard(UUID id) {
         Card card = getOrThrow(id, cardRepository::findById);
@@ -29,9 +32,9 @@ public class AdminCardService extends DefaultService {
 
     public void createCard(Card card) {
         if(card.getUser() == null) throw new EntityNotFoundException(format(ENTITY_NOT_FOUND, "you send is"));
-        //if user is blocked
-        Card existedCard = cardRepository.findByCardNumber(card.getCardNumber()).orElse(null);
+        Card existedCard = cardRepository.findByCardNumber(cardEncryptor.encrypt(card.getCardNumber())).orElse(null);
         if (existedCard != null) throw new EntityExistsException(format(ENTITY_ALREADY_EXIST,card.getId()));
+        card.setCardNumber(cardEncryptor.encrypt(card.getCardNumber()));
         card.setCreatedAt(Instant.now());
         card.setUpdatedAt(Instant.now());
         cardRepository.save(card);
@@ -44,13 +47,13 @@ public class AdminCardService extends DefaultService {
 
     public List<Card> getCards(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Card> pageOfCards = cardRepository.findAll(pageable);
+        Page<Card> pageOfCards = cardRepository.findAll(pageable).map(cardEncryptor::decryptCard);
         return pageOfCards.getContent();
     }
 
     public List<Card> getToBlockCards(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Card> pageOfCards = cardRepository.findAllByStatus("TO_BLOCK", pageable);
+        Page<Card> pageOfCards = cardRepository.findAllByStatus("TO_BLOCK", pageable).map(cardEncryptor::decryptCard);
         return pageOfCards.getContent();
     }
 
@@ -59,11 +62,12 @@ public class AdminCardService extends DefaultService {
         updatedCard.setId(card.getId());
         updatedCard.setCreatedAt(card.getCreatedAt());
         updatedCard.setUpdatedAt(Instant.now());
+        updatedCard.setCardNumber(cardEncryptor.encrypt(card.getCardNumber()));
         cardRepository.save(updatedCard);
     }
 
     public Card getCard(UUID id) {
-        return getOrThrow(id, cardRepository::findById);
+        return cardEncryptor.decryptCard(getOrThrow(id, cardRepository::findById));
     }
 
 }

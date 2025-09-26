@@ -33,6 +33,9 @@ public class Card {
     @Column(name = "card_number", nullable = false, unique = true)
     private String cardNumber;
 
+    @Column(name = "card_bin", nullable = false, unique = true)
+    private String cardBin;
+
     @Column(name = "owner_name", nullable = false)
     private String ownerName;
 
