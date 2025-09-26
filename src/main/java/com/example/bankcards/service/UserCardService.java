@@ -70,7 +70,7 @@ public class UserCardService extends DefaultService {
     public List<Card> getCardsByCardNumber(Integer page, Integer size, String cardNumber) {
         User user = getCurrentUser();
         Pageable pageable = PageRequest.of(page, size);
-        Page<Card> pageOfCards = cardRepository.findAllByCardNumberStartingWithAndUser(cardNumber, user, pageable).map(cardEncryptor::decryptCardAndHidden);
+        Page<Card> pageOfCards = cardRepository.findAllByCardBinStartingWithAndUser(cardNumber, user, pageable).map(cardEncryptor::decryptCardAndHidden);
         return pageOfCards.getContent();
     }
 
