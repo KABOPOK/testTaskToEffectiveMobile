@@ -19,8 +19,8 @@ public class Generator {
         }
         return sb.toString();
     }
-    private static final Role roleUser = new Role(UUID.randomUUID(),"ROLE_USER",null);
-    private static final Role roleAdmin = new Role(UUID.randomUUID(),"ROLE_USER",null);
+    public static final Role roleUser = new Role(UUID.randomUUID(),"ROLE_USER",null);
+    public static final Role roleAdmin = new Role(UUID.randomUUID(),"ROLE_ADMIN",null);
 
     public static Card generateCard() {
         Card card = new Card();

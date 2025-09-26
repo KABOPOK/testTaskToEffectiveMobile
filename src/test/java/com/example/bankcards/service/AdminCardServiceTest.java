@@ -2,7 +2,6 @@ package com.example.bankcards.service;
 
 import com.example.bankcards.Generator;
 import com.example.bankcards.entity.Card;
-import com.example.bankcards.entity.User;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.security.CardEncryptor;
 import jakarta.persistence.EntityExistsException;
@@ -11,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -44,7 +42,7 @@ public class AdminCardServiceTest {
 
     // ---------------- blockCard ----------------
     @Test
-    void blockCard_shouldUpdateStatusToBlocked() {
+    void blockCard_shouldUpdateStatusToBlocked_whenCardExists() {
         Card card = Generator.generateCard();
         when(cardRepository.findById(card.getId())).thenReturn(Optional.of(card));
         when(cardRepository.save(any(Card.class))).thenAnswer(inv -> inv.getArgument(0));
@@ -57,12 +55,13 @@ public class AdminCardServiceTest {
     }
 
     @Test
-    void blockCard_shouldThrowWhenCardNotFound() {
+    void blockCard_shouldThrowException_whenCardNotFound() {
         UUID id = UUID.randomUUID();
         when(cardRepository.findById(id)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> adminCardService.blockCard(id));
     }
+
     // ---------------- createCard ----------------
     @Test
     void createCard_shouldSaveNewCard() {
@@ -77,14 +76,14 @@ public class AdminCardServiceTest {
     }
 
     @Test
-    void createCard_shouldThrowIfUserIsNull() {
+    void createCard_shouldThrowException_whenUserIsNull() {
         Card card = Generator.generateCard(null);
 
         assertThrows(EntityNotFoundException.class, () -> adminCardService.createCard(card));
     }
 
     @Test
-    void createCard_shouldThrowIfCardAlreadyExists() {
+    void createCard_shouldThrowException_whenCardAlreadyExists() {
         Card card = Generator.generateCard();
         when(cardEncryptor.encrypt(anyString())).thenAnswer(inv -> inv.getArgument(0));
         when(cardRepository.findByCardNumber(anyString())).thenReturn(Optional.of(card));
@@ -94,7 +93,7 @@ public class AdminCardServiceTest {
 
     // ---------------- deleteCard ----------------
     @Test
-    void deleteCard_shouldDeleteUser() {
+    void deleteCard_shouldDeleteCard_whenCardExists() {
         Card card = Generator.generateCard();
         when(cardRepository.findById(card.getId())).thenReturn(Optional.of(card));
         doNothing().when(cardRepository).delete(card);
@@ -105,7 +104,7 @@ public class AdminCardServiceTest {
     }
 
     @Test
-    void deleteCard_shouldThrowWhenNotFound() {
+    void deleteCard_shouldThrowException_whenCardNotFound() {
         UUID id = UUID.randomUUID();
         when(cardRepository.findById(id)).thenReturn(Optional.empty());
 
@@ -114,7 +113,7 @@ public class AdminCardServiceTest {
 
     // ---------------- getCards ----------------
     @Test
-    void getCards_shouldReturnDecryptedCards() {
+    void getCards_shouldReturnDecryptedCards_whenCardsExist() {
         Card card = Generator.generateCard();
         Page<Card> page = new PageImpl<>(List.of(card));
         when(cardRepository.findAll(any(Pageable.class))).thenReturn(page);
@@ -127,7 +126,7 @@ public class AdminCardServiceTest {
 
     // ---------------- getToBlockCards ----------------
     @Test
-    void getToBlockCards_shouldReturnDecryptedCards() {
+    void getToBlockCards_shouldReturnDecryptedCards_whenCardsExist() {
         Card card = Generator.generateCard();
         Page<Card> page = new PageImpl<>(List.of(card));
         when(cardRepository.findAllByStatus(eq("TO_BLOCK"), any(Pageable.class))).thenReturn(page);
@@ -140,7 +139,7 @@ public class AdminCardServiceTest {
 
     // ---------------- updateCard ----------------
     @Test
-    void updateCard_shouldSaveUpdatedCard() {
+    void updateCard_shouldSaveUpdatedCard_whenCardExists() {
         Card oldCard = Generator.generateCard();
         Card newCard = Generator.generateCard();
         when(cardRepository.findById(oldCard.getId())).thenReturn(Optional.of(oldCard));
@@ -154,7 +153,7 @@ public class AdminCardServiceTest {
     }
 
     @Test
-    void updateCard_shouldThrowWhenNotFound() {
+    void updateCard_shouldThrowException_whenCardNotFound() {
         UUID id = UUID.randomUUID();
         Card newCard = Generator.generateCard();
         when(cardRepository.findById(id)).thenReturn(Optional.empty());
@@ -164,7 +163,7 @@ public class AdminCardServiceTest {
 
     // ---------------- getCard ----------------
     @Test
-    void getCard_shouldReturnDecryptedCard() {
+    void getCard_shouldReturnDecryptedCard_whenCardExists() {
         Card card = Generator.generateCard();
         when(cardRepository.findById(card.getId())).thenReturn(Optional.of(card));
         when(cardEncryptor.decryptCard(any(Card.class))).thenAnswer(inv -> inv.getArgument(0));
@@ -175,11 +174,10 @@ public class AdminCardServiceTest {
     }
 
     @Test
-    void getCard_shouldThrowWhenNotFound() {
+    void getCard_shouldThrowException_whenCardNotFound() {
         UUID id = UUID.randomUUID();
         when(cardRepository.findById(id)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> adminCardService.getCard(id));
     }
-
 }
