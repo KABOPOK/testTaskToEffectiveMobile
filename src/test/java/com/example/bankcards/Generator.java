@@ -3,7 +3,9 @@ package com.example.bankcards;
 import com.example.bankcards.entity.Card;
 import com.example.bankcards.entity.Role;
 import com.example.bankcards.entity.User;
+import generated.com.example.bankcards.api.model.AuthDataDto;
 import generated.com.example.bankcards.api.model.CardWithUserIdDto;
+import generated.com.example.bankcards.api.model.TokenDto;
 import generated.com.example.bankcards.api.model.UserAdminUpdateDto;
 import generated.com.example.bankcards.api.model.UserDto;
 
@@ -94,5 +96,17 @@ public class Generator {
         dto.setStatus(UserAdminUpdateDto.StatusEnum.valueOf(user.getStatus()));
         dto.setRoles(List.of("ROLE_USER"));
         return dto;
+    }
+    public static AuthDataDto generateAuthDataDto(User user) {
+        AuthDataDto authDataDto = new AuthDataDto();
+        authDataDto.setLogin(user.getLogin());
+        authDataDto.setPassword(user.getPassword());
+        return authDataDto;
+    }
+
+    public static TokenDto generateTokenDto() {
+        TokenDto tokenDto = new TokenDto();
+        tokenDto.setToken("jwt-token");
+        return tokenDto;
     }
 }
