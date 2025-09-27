@@ -84,7 +84,7 @@ paths:
             schema:
               $ref: '#/components/schemas/CardWithUserIdDto'
       responses:
-        '201':
+        '200':
           description: Обновлена карта
         '401':
           description: Не авторизован
@@ -112,7 +112,7 @@ paths:
             type: string
             format: uuid
       responses:
-        '201':
+        '200':
           description: Карта успешно заблокирована
         '401':
           description: Не авторизован
@@ -140,7 +140,7 @@ paths:
             type: string
             format: uuid
       responses:
-        '201':
+        '200':
           description: Карта удалена
         '401':
           description: Не авторизован
@@ -248,7 +248,7 @@ paths:
             schema:
               $ref: '#/components/schemas/UserAdminUpdateDto'
       responses:
-        '201':
+        '200':
           description: Пользователь обновлен
         '401':
           description: Не авторизован
@@ -276,7 +276,7 @@ paths:
             type: string
             format: uuid
       responses:
-        '201':
+        '200':
           description: Пользователь заблокирован
         '401':
           description: Не авторизован
@@ -473,7 +473,7 @@ paths:
             type: string
             format: uuid
       responses:
-        '201':
+        '200':
           description: Запрос на блокировку отправлен
         '404':
           description: Карта не найдена
@@ -545,7 +545,7 @@ paths:
             schema:
               $ref: '#/components/schemas/TransferDataDto'
       responses:
-        '201':
+        '200':
           description: Перевод успешно выполнен
         '404':
           description: Карта не найдена
@@ -580,7 +580,7 @@ paths:
             schema:
               $ref: '#/components/schemas/UserDto'
       responses:
-        '201':
+        '200':
           description: Пользователь зарегистрирован
         '409':
           description: Конфликт

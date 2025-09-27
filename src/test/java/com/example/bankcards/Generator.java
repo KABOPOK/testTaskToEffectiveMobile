@@ -3,6 +3,7 @@ package com.example.bankcards;
 import com.example.bankcards.entity.Card;
 import com.example.bankcards.entity.Role;
 import com.example.bankcards.entity.User;
+import generated.com.example.bankcards.api.model.CardWithUserIdDto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -20,7 +21,6 @@ public class Generator {
         return sb.toString();
     }
     public static final Role roleUser = new Role(UUID.randomUUID(),"ROLE_USER",null);
-    public static final Role roleAdmin = new Role(UUID.randomUUID(),"ROLE_ADMIN",null);
 
     public static Card generateCard() {
         Card card = new Card();
@@ -56,5 +56,17 @@ public class Generator {
         user.setStatus("ACTIVE");
         user.setRoles(List.of(roleUser));
         return user;
+    }
+
+    public static CardWithUserIdDto generateCardWithUserIdDto(Card card) {
+        CardWithUserIdDto dto = new CardWithUserIdDto();
+        dto.setId(card.getId());
+        dto.setUserId(card.getUser().getId());
+        dto.setCardNumber(card.getCardNumber());
+        dto.setOwnerName(card.getOwnerName());
+        dto.setExpirationDate(card.getExpirationDate());
+        dto.setStatus(card.getStatus());
+        return dto;
+
     }
 }
