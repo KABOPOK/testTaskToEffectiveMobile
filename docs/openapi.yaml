@@ -498,7 +498,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ExceptionBody'
-
   /api/user/card/request_to_block/{id}:
     put:
       tags:

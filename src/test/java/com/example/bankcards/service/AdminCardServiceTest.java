@@ -5,7 +5,6 @@ import com.example.bankcards.entity.Card;
 import com.example.bankcards.entity.User;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.security.CardEncryptor;
-import com.example.bankcards.service.AdminCardService;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,11 +16,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -186,4 +183,5 @@ public class AdminCardServiceTest {
 
         assertThrows(EntityNotFoundException.class, () -> adminCardService.getCard(id));
     }
+
 }

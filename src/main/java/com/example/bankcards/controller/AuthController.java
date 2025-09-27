@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 public class AuthController implements AuthApi {
+
     private final AdminUserService adminUserService;
     private final AuthService authService;
     private final UserMapper userMapper;

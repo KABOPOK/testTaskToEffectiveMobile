@@ -3,7 +3,6 @@ package com.example.bankcards.service;
 import com.example.bankcards.entity.User;
 import com.example.bankcards.repository.RoleRepository;
 import com.example.bankcards.repository.UserRepository;
-import generated.com.example.bankcards.api.model.UserDto;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -13,13 +12,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
 import static java.lang.String.format;
 
 @Service
@@ -90,4 +86,5 @@ public class AdminUserService extends DefaultService implements UserDetailsServi
     public List<User> getUsers() {
         return userRepository.findAll();
     }
+
 }

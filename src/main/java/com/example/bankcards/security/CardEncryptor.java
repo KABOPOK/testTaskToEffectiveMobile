@@ -3,7 +3,6 @@ package com.example.bankcards.security;
 import com.example.bankcards.entity.Card;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
@@ -46,6 +45,7 @@ public class CardEncryptor {
         card.setCardNumber(decrypted);
         return card;
     }
+
     public Card decryptCardAndHidden(Card card) {
         String decryptedCardNumber = decrypt(card.getCardNumber());
         String hideCardNumber = "************" + decryptedCardNumber
@@ -53,5 +53,6 @@ public class CardEncryptor {
         card.setCardNumber(hideCardNumber);
         return card;
     }
+
 }
 

@@ -1,7 +1,6 @@
 package com.example.bankcards.service;
 
 import com.example.bankcards.entity.Card;
-import com.example.bankcards.mappers.CardMapper;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.security.CardEncryptor;
 import jakarta.persistence.EntityExistsException;
@@ -11,7 +10,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -20,6 +18,7 @@ import static java.lang.String.format;
 @Service
 @RequiredArgsConstructor
 public class AdminCardService extends DefaultService {
+
     private final CardRepository cardRepository;
     private final CardEncryptor cardEncryptor;
 

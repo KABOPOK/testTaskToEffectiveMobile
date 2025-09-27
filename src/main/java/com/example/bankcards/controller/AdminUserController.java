@@ -8,15 +8,16 @@ import generated.com.example.bankcards.api.model.UserAdminUpdateDto;
 import generated.com.example.bankcards.api.model.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
 public class AdminUserController implements AdminUserApi {
+
     private final AdminUserService adminUserService;
     private final UserMapper userMapper;
+
     @Override
     public void blockUser(UUID id) {
         adminUserService.blockUser(id);
@@ -43,4 +44,5 @@ public class AdminUserController implements AdminUserApi {
         User updatedUser = userMapper.mapFromUserAdminDto(userAdminUpdateDto);
         adminUserService.updateUser(id, updatedUser);
     }
+
 }

@@ -17,12 +17,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -71,4 +68,5 @@ public class User {
     )
     @ToString.Exclude
     private List<Role> roles = new ArrayList<>();
+
 }

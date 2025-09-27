@@ -2,11 +2,9 @@ package com.example.bankcards.mappers;
 
 import com.example.bankcards.entity.Role;
 import com.example.bankcards.repository.RoleRepository;
-import generated.com.example.bankcards.api.model.UserDto;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.List;
 

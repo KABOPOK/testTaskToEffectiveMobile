@@ -2,11 +2,9 @@ package com.example.bankcards.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
-
 import static java.lang.String.format;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

@@ -5,10 +5,7 @@ import com.example.bankcards.entity.User;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.repository.UserRepository;
 import com.example.bankcards.security.CardEncryptor;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,12 +17,12 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
-
 import static java.lang.String.format;
 
 @Service
 @RequiredArgsConstructor
 public class UserCardService extends DefaultService {
+
     private final UserRepository userRepository;
     private final CardRepository cardRepository;
     private final CardEncryptor cardEncryptor;
@@ -107,4 +104,5 @@ public class UserCardService extends DefaultService {
     public List<Card> getAllCards() {
         return cardRepository.findCardByUser(getCurrentUser()).stream().map(cardEncryptor::decryptCardAndHidden).toList();
     }
+
 }

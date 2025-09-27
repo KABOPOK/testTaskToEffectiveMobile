@@ -14,7 +14,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-
 import java.time.Duration;
 import java.util.Date;
 import java.util.HashMap;
@@ -22,12 +21,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import static java.lang.String.format;
 
 @Component
 @RequiredArgsConstructor
 public class JwtTokenUtils {
+
     @Value("${jwt.secret}")
     private String secret;
 
@@ -84,4 +83,5 @@ public class JwtTokenUtils {
         return new UsernamePasswordAuthenticationToken(login, null,
                 getRoles(jwt).stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
     }
+
 }

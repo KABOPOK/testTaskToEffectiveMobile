@@ -7,10 +7,8 @@ import generated.com.example.bankcards.api.UserCardApi;
 import generated.com.example.bankcards.api.model.BalanceDto;
 import generated.com.example.bankcards.api.model.CardDto;
 import generated.com.example.bankcards.api.model.TransferDataDto;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
@@ -56,4 +54,5 @@ public class UserCardController implements UserCardApi {
     public void transferBetweenCards(TransferDataDto transferDataDto) {
         userCardService.transferMoney(transferDataDto.getFromCardId(), transferDataDto.getToCardId(), BigDecimal.valueOf(transferDataDto.getAmount()));
     }
+
 }

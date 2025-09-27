@@ -10,7 +10,6 @@ import generated.com.example.bankcards.api.model.TokenDto;
 import generated.com.example.bankcards.api.model.TransferDataDto;
 import generated.com.example.bankcards.api.model.UserAdminUpdateDto;
 import generated.com.example.bankcards.api.model.UserDto;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -130,4 +129,5 @@ public class Generator {
         transferDataDto.setAmount(200.0);
         return transferDataDto;
     }
+
 }

@@ -6,7 +6,6 @@ import generated.com.example.bankcards.api.model.UserAdminUpdateDto;
 import generated.com.example.bankcards.api.model.UserDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
 
 @Mapper(componentModel = "spring", uses = UserMapperHelper.class)
 public interface UserMapper {
@@ -18,4 +17,5 @@ public interface UserMapper {
     User mapFromUserAdminDto(UserAdminUpdateDto userAdminUpdateDto);
     User mapFromAuthData(AuthDataDto authDataDto);
     User map(AuthDataDto authDataDto);
+
 }
