@@ -4,6 +4,8 @@ import com.example.bankcards.entity.Card;
 import com.example.bankcards.entity.Role;
 import com.example.bankcards.entity.User;
 import generated.com.example.bankcards.api.model.CardWithUserIdDto;
+import generated.com.example.bankcards.api.model.UserAdminUpdateDto;
+import generated.com.example.bankcards.api.model.UserDto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -68,5 +70,29 @@ public class Generator {
         dto.setStatus(card.getStatus());
         return dto;
 
+    }
+
+    public static UserDto generateUserDto(User user) {
+        UserDto dto = new UserDto();
+        dto.setId(user.getId());
+        dto.setName(user.getName());
+        dto.setLogin(user.getLogin());
+        dto.setPassword(user.getPassword());
+        dto.setStatus(UserDto.StatusEnum.valueOf(user.getStatus()));
+        dto.setRoles(List.of("ROLE_USER"));
+        dto.setCreatedAt(user.getCreatedAt());
+        dto.setUpdatedAt(user.getUpdatedAt());
+        return dto;
+    }
+
+    public static UserAdminUpdateDto generateUserAdminUpdateDto(User user) {
+        UserAdminUpdateDto dto = new UserAdminUpdateDto();
+        dto.setId(user.getId());
+        dto.setName(user.getName());
+        dto.setLogin(user.getLogin());
+        dto.setPassword(user.getPassword());
+        dto.setStatus(UserAdminUpdateDto.StatusEnum.valueOf(user.getStatus()));
+        dto.setRoles(List.of("ROLE_USER"));
+        return dto;
     }
 }
