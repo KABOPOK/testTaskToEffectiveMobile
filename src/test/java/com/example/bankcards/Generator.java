@@ -4,8 +4,10 @@ import com.example.bankcards.entity.Card;
 import com.example.bankcards.entity.Role;
 import com.example.bankcards.entity.User;
 import generated.com.example.bankcards.api.model.AuthDataDto;
+import generated.com.example.bankcards.api.model.CardDto;
 import generated.com.example.bankcards.api.model.CardWithUserIdDto;
 import generated.com.example.bankcards.api.model.TokenDto;
+import generated.com.example.bankcards.api.model.TransferDataDto;
 import generated.com.example.bankcards.api.model.UserAdminUpdateDto;
 import generated.com.example.bankcards.api.model.UserDto;
 
@@ -108,5 +110,24 @@ public class Generator {
         TokenDto tokenDto = new TokenDto();
         tokenDto.setToken("jwt-token");
         return tokenDto;
+    }
+
+    public static CardDto generateCardDto(Card card) {
+        CardDto dto = new CardDto();
+        dto.setId(card.getId());
+        dto.setCardNumber(card.getCardNumber());
+        dto.setStatus(card.getStatus());
+        dto.setBalance(Double.parseDouble(card.getBalance().toString()));
+        dto.setCreatedAt(card.getCreatedAt());
+        dto.setUpdatedAt(card.getUpdatedAt());
+        return dto;
+    }
+
+    public static TransferDataDto generateTransferDataDto() {
+        TransferDataDto transferDataDto = new TransferDataDto();
+        transferDataDto.setFromCardId(UUID.randomUUID());
+        transferDataDto.setToCardId(UUID.randomUUID());
+        transferDataDto.setAmount(200.0);
+        return transferDataDto;
     }
 }
