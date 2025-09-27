@@ -5,6 +5,7 @@ import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.security.CardEncryptor;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,7 +33,8 @@ public class AdminCardService extends DefaultService {
     public void createCard(Card card) {
         if(card.getUser() == null) throw new EntityNotFoundException(format(ENTITY_NOT_FOUND, "you send is"));
         Card existedCard = cardRepository.findByCardNumber(cardEncryptor.encrypt(card.getCardNumber())).orElse(null);
-        if (existedCard != null) throw new EntityExistsException(format(ENTITY_ALREADY_EXIST,card.getId()));
+        if (existedCard != null) throw new EntityExistsException(format(ENTITY_ALREADY_EXIST, existedCard.getId()));
+        if (card.getCardNumber().length() != 16) throw new ValidationException(format("card number length should be 16 instead of %s", card.getCardNumber().length()));
         card.setCardNumber(cardEncryptor.encrypt(card.getCardNumber()));
         card.setCreatedAt(Instant.now());
         card.setUpdatedAt(Instant.now());

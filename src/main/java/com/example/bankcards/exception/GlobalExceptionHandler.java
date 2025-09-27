@@ -5,17 +5,18 @@ import generated.com.example.bankcards.api.model.ExceptionBody;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.RollbackException;
+import jakarta.validation.ValidationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import javax.management.InstanceAlreadyExistsException;
 import java.util.List;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(EntityExistsException.class)
@@ -48,6 +49,14 @@ public class GlobalExceptionHandler {
                 List.of(new ApiError("Access denied", ex.getMessage()))
         );
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
+    }
+
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<ExceptionBody> handleValidationException(ValidationException ex) {
+        ExceptionBody body = new ExceptionBody(
+                List.of(new ApiError("Validation error", ex.getMessage()))
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
     @ExceptionHandler(TransactionSystemException.class)

@@ -1,5 +1,6 @@
 package com.example.bankcards.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -9,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,7 +33,6 @@ public class Card {
     private UUID id;
 
     @Column(name = "card_number", nullable = false, unique = true)
-    @Size(min = 16, max = 16, message = "Card number must be 16 digits")
     private String cardNumber;
 
     @Column(name = "card_bin", nullable = false, unique = true)
@@ -42,6 +43,8 @@ public class Card {
     private String ownerName;
 
     @Column(name = "expiration_date", nullable = false)
+    @Future(message = "Expiration date must be in the future")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate expirationDate;
 
     @Column(name = "status", nullable = false)
