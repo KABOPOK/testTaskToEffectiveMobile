@@ -103,4 +103,8 @@ public class UserCardService extends DefaultService {
         cardRepository.save(fromCard);
         cardRepository.save(toCard);
     }
+
+    public List<Card> getAllCards() {
+        return cardRepository.findCardByUser(getCurrentUser()).stream().map(cardEncryptor::decryptCardAndHidden).toList();
+    }
 }

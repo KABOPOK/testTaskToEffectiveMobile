@@ -23,4 +23,5 @@ public interface CardRepository extends JpaRepository<Card, UUID> {
     Optional<Card> findByCardNumber(String cardNumber);
 
     List<Card> findAllByExpirationDateBeforeAndStatusNot(LocalDate now, String expired);
+    List<Card> findCardByUser(User user);
 }

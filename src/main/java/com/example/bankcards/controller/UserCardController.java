@@ -24,6 +24,12 @@ public class UserCardController implements UserCardApi {
     private final CardMapper cardMapper;
 
     @Override
+    public List<CardDto> getAllUserCards() {
+        List<Card> cardList = userCardService.getAllCards();
+        return cardList.stream().map(cardMapper::mapToCardDto).toList();
+    }
+
+    @Override
     public BalanceDto getCardBalance(UUID id) {
         BalanceDto balanceDto = new BalanceDto();
         balanceDto.setBalance(userCardService.getCardBalance(id).toString());

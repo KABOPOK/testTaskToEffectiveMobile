@@ -459,6 +459,40 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ExceptionBody'
+  /api/user/get_all_cards:
+    get:
+      tags:
+        - User-Card
+      summary: Получить все карты пользователя
+      operationId: getAllUserCards
+      responses:
+        '200':
+          description: Список карт пользователя
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CardDto'
+        '404':
+          description: Карты не найдены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '403':
+          description: Отказ доступа
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+
   /api/user/card/request_to_block/{id}:
     put:
       tags:
