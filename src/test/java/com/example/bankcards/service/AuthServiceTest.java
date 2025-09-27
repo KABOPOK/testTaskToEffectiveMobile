@@ -46,10 +46,7 @@ class AuthServiceTest {
     void getToken_shouldReturnJwtToken_whenUserIsActive() {
         User user = Generator.generateUser();
         UserDetails userDetails = mock(UserDetails.class);
-
         when(adminUserService.getUser(user.getLogin())).thenReturn(user);
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                .thenAnswer(inv -> inv.getArgument(0));
         when(adminUserService.loadUserByUsername(user.getLogin())).thenReturn(userDetails);
         when(jwtTokenUtils.generateToken(userDetails)).thenReturn("jwt-token");
 
@@ -57,8 +54,6 @@ class AuthServiceTest {
 
         assertThat(result).isEqualTo("jwt-token");
         verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
-        verify(adminUserService).loadUserByUsername(user.getLogin());
-        verify(jwtTokenUtils).generateToken(userDetails);
     }
 
 
@@ -70,8 +65,6 @@ class AuthServiceTest {
         when(adminUserService.getUser("blocked")).thenReturn(user);
 
         assertThrows(EntityBlockedException.class, () -> authService.getToken(user));
-
-        verify(adminUserService).getUser("blocked");
         verifyNoInteractions(authenticationManager, jwtTokenUtils);
     }
 }

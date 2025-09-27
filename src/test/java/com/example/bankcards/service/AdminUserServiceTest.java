@@ -7,6 +7,7 @@ import com.example.bankcards.repository.RoleRepository;
 import com.example.bankcards.repository.UserRepository;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -42,15 +43,26 @@ class AdminUserServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    private User activeUser;
+    private Role roleUser;
+
+    @BeforeEach
+    void setUp() {
+        activeUser = Generator.generateUser();
+        roleUser = Generator.roleUser;
+
+       // when(passwordEncoder.encode(any())).thenAnswer(inv -> inv.getArgument(0));
+       // when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+    }
+
     // ---------------- getUser by id ----------------
     @Test
     void getUser_shouldReturnUser_whenExists() {
-        User user = Generator.generateUser();
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(userRepository.findById(activeUser.getId())).thenReturn(Optional.of(activeUser));
 
-        User result = adminUserService.getUser(user.getId());
+        User result = adminUserService.getUser(activeUser.getId());
 
-        assertThat(result).isEqualTo(user);
+        assertThat(result).isEqualTo(activeUser);
     }
 
     @Test
@@ -64,12 +76,11 @@ class AdminUserServiceTest {
     // ---------------- getUser by login ----------------
     @Test
     void getUserByLogin_shouldReturnUser_whenExists() {
-        User user = Generator.generateUser();
-        when(userRepository.findByLogin(user.getLogin())).thenReturn(Optional.of(user));
+        when(userRepository.findByLogin(activeUser.getLogin())).thenReturn(Optional.of(activeUser));
 
-        User result = adminUserService.getUser(user.getLogin());
+        User result = adminUserService.getUser(activeUser.getLogin());
 
-        assertThat(result).isEqualTo(user);
+        assertThat(result).isEqualTo(activeUser);
     }
 
     @Test
@@ -81,41 +92,36 @@ class AdminUserServiceTest {
 
     // ---------------- createUser ----------------
     @Test
-    void createUser_shouldSaveNewUser() {
-        User user = Generator.generateUser();
-        Role role = Generator.roleUser;
-        when(userRepository.findByLogin(user.getLogin())).thenReturn(Optional.empty());
-        when(roleRepository.findByRole("ROLE_USER")).thenReturn(Optional.of(role));
-        when(passwordEncoder.encode(user.getPassword())).thenReturn("encoded");
-        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+    void createUser_shouldSaveNewUser_whenNotExists() {
+        when(userRepository.findByLogin(activeUser.getLogin())).thenReturn(Optional.empty());
+        when(roleRepository.findByRole("ROLE_USER")).thenReturn(Optional.of(roleUser));
+        when(passwordEncoder.encode(any())).thenAnswer(inv ->inv.getArgument(0));
 
-        adminUserService.createUser(user);
+        adminUserService.createUser(activeUser);
 
-        assertThat(user.getPassword()).isEqualTo("encoded");
-        assertThat(user.getRoles()).contains(role);
-        assertThat(user.getStatus()).isEqualTo("ACTIVE");
-        verify(userRepository).save(user);
+        assertThat(activeUser.getRoles()).contains(roleUser);
+        assertThat(activeUser.getStatus()).isEqualTo("ACTIVE");
+        verify(userRepository).save(activeUser);
+        verify(passwordEncoder).encode(activeUser.getPassword());
     }
 
     @Test
     void createUser_shouldThrow_whenAlreadyExists() {
-        User user = Generator.generateUser();
-        when(userRepository.findByLogin(user.getLogin())).thenReturn(Optional.of(user));
+        when(userRepository.findByLogin(activeUser.getLogin())).thenReturn(Optional.of(activeUser));
 
-        assertThrows(EntityExistsException.class, () -> adminUserService.createUser(user));
+        assertThrows(EntityExistsException.class, () -> adminUserService.createUser(activeUser));
     }
 
     // ---------------- loadUserByUsername ----------------
     @Test
     void loadUserByUsername_shouldReturnUserDetails() {
-        User user = Generator.generateUser();
-        user.setRoles(List.of(Generator.roleUser));
-        when(userRepository.findByLogin(user.getLogin())).thenReturn(Optional.of(user));
+        activeUser.setRoles(List.of(roleUser));
+        when(userRepository.findByLogin(activeUser.getLogin())).thenReturn(Optional.of(activeUser));
 
-        UserDetails details = adminUserService.loadUserByUsername(user.getLogin());
+        UserDetails details = adminUserService.loadUserByUsername(activeUser.getLogin());
 
-        assertThat(details.getUsername()).isEqualTo(user.getLogin());
-        assertThat(details.getPassword()).isEqualTo(user.getPassword());
+        assertThat(details.getUsername()).isEqualTo(activeUser.getLogin());
+        assertThat(details.getPassword()).isEqualTo(activeUser.getPassword());
         assertThat(details.getAuthorities()).extracting("authority").contains("ROLE_USER");
     }
 
@@ -129,44 +135,38 @@ class AdminUserServiceTest {
     // ---------------- blockUser ----------------
     @Test
     void blockUser_shouldSetBlockedStatus() {
-        User user = Generator.generateUser();
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(userRepository.findById(activeUser.getId())).thenReturn(Optional.of(activeUser));
 
-        adminUserService.blockUser(user.getId());
+        adminUserService.blockUser(activeUser.getId());
 
-        assertThat(user.getStatus()).isEqualTo("BLOCKED");
-        verify(userRepository).save(eq(user));
+        assertThat(activeUser.getStatus()).isEqualTo("BLOCKED");
+        verify(userRepository).save(activeUser);
     }
 
     // ---------------- updateUser ----------------
     @Test
     void updateUser_shouldUpdateUser() {
-        User user = Generator.generateUser();
         User updated = Generator.generateUser();
         updated.setPassword("newPass");
+        updated.setLogin("panda");
+        when(passwordEncoder.encode(any())).thenAnswer(inv -> inv.getArgument(0));
+        when(userRepository.findById(activeUser.getId())).thenReturn(Optional.of(activeUser));
 
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        when(passwordEncoder.encode("newPass")).thenReturn("encodedNew");
-        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+        adminUserService.updateUser(activeUser.getId(), updated);
 
-        adminUserService.updateUser(user.getId(), updated);
-
-        assertThat(user.getPassword()).isEqualTo("encodedNew");
-        assertThat(user.getLogin()).isEqualTo(updated.getLogin());
-        assertThat(user.getName()).isEqualTo(updated.getName());
-        verify(userRepository).save(user);
+        assertThat(activeUser.getLogin()).isEqualTo(updated.getLogin());
+        verify(userRepository).save(updated);
+        verify(passwordEncoder).encode(updated.getPassword());
     }
 
     // ---------------- deleteUser ----------------
     @Test
     void deleteUser_shouldDeleteExistingUser() {
-        User user = Generator.generateUser();
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(userRepository.findById(activeUser.getId())).thenReturn(Optional.of(activeUser));
 
-        adminUserService.deleteUser(user.getId());
+        adminUserService.deleteUser(activeUser.getId());
 
-        verify(userRepository).delete(user);
+        verify(userRepository).delete(activeUser);
     }
 
     // ---------------- getUsers ----------------

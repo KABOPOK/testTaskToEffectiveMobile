@@ -2,10 +2,13 @@ package com.example.bankcards.service;
 
 import com.example.bankcards.Generator;
 import com.example.bankcards.entity.Card;
+import com.example.bankcards.entity.User;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.security.CardEncryptor;
+import com.example.bankcards.service.AdminCardService;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -40,18 +43,24 @@ public class AdminCardServiceTest {
     @Mock
     private CardEncryptor cardEncryptor;
 
+    private User user;
+    private Card activeCard;
+
+    @BeforeEach
+    void setUp() {
+        user = Generator.generateUser();
+        activeCard = Generator.generateCard(user);
+    }
+
     // ---------------- blockCard ----------------
     @Test
-    void blockCard_shouldUpdateStatusToBlocked_whenCardExists() {
-        Card card = Generator.generateCard();
-        when(cardRepository.findById(card.getId())).thenReturn(Optional.of(card));
-        when(cardRepository.save(any(Card.class))).thenAnswer(inv -> inv.getArgument(0));
+    void blockCard_shouldBlockCard_whenCardExists() {
+        when(cardRepository.findById(activeCard.getId())).thenReturn(Optional.of(activeCard));
 
-        adminCardService.blockCard(card.getId());
+        adminCardService.blockCard(activeCard.getId());
 
-        verify(cardRepository).findById(card.getId());
-        verify(cardRepository).save(card);
-        assertThat(card.getStatus()).isEqualTo("BLOСKED");
+        assertThat(activeCard.getStatus()).isEqualTo("BLOCKED");
+        verify(cardRepository).save(activeCard);
     }
 
     @Test
@@ -65,14 +74,13 @@ public class AdminCardServiceTest {
     // ---------------- createCard ----------------
     @Test
     void createCard_shouldSaveNewCard() {
-        Card card = Generator.generateCard();
-        when(cardEncryptor.encrypt(anyString())).thenAnswer(inv -> inv.getArgument(0));
         when(cardRepository.findByCardNumber(anyString())).thenReturn(Optional.empty());
-        when(cardRepository.save(any(Card.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(cardEncryptor.encrypt(anyString())).thenAnswer(inv -> inv.getArgument(0));
 
-        adminCardService.createCard(card);
+        adminCardService.createCard(activeCard);
 
-        verify(cardRepository).save(card);
+        verify(cardRepository).save(activeCard);
+        verify(cardEncryptor, atLeastOnce()).encrypt(activeCard.getCardNumber());
     }
 
     @Test
@@ -84,23 +92,20 @@ public class AdminCardServiceTest {
 
     @Test
     void createCard_shouldThrowException_whenCardAlreadyExists() {
-        Card card = Generator.generateCard();
-        when(cardEncryptor.encrypt(anyString())).thenAnswer(inv -> inv.getArgument(0));
-        when(cardRepository.findByCardNumber(anyString())).thenReturn(Optional.of(card));
+        when(cardEncryptor.encrypt(activeCard.getCardNumber())).thenReturn(activeCard.getCardNumber());
+        when(cardRepository.findByCardNumber(activeCard.getCardNumber())).thenReturn(Optional.of(activeCard));
 
-        assertThrows(EntityExistsException.class, () -> adminCardService.createCard(card));
+        assertThrows(EntityExistsException.class, () -> adminCardService.createCard(activeCard));
     }
 
     // ---------------- deleteCard ----------------
     @Test
     void deleteCard_shouldDeleteCard_whenCardExists() {
-        Card card = Generator.generateCard();
-        when(cardRepository.findById(card.getId())).thenReturn(Optional.of(card));
-        doNothing().when(cardRepository).delete(card);
+        when(cardRepository.findById(activeCard.getId())).thenReturn(Optional.of(activeCard));
 
-        adminCardService.deleteCard(card.getId());
+        adminCardService.deleteCard(activeCard.getId());
 
-        verify(cardRepository).delete(card);
+        verify(cardRepository).delete(activeCard);
     }
 
     @Test
@@ -114,63 +119,64 @@ public class AdminCardServiceTest {
     // ---------------- getCards ----------------
     @Test
     void getCards_shouldReturnDecryptedCards_whenCardsExist() {
-        Card card = Generator.generateCard();
-        Page<Card> page = new PageImpl<>(List.of(card));
+        Page<Card> page = new PageImpl<>(List.of(activeCard));
         when(cardRepository.findAll(any(Pageable.class))).thenReturn(page);
         when(cardEncryptor.decryptCard(any(Card.class))).thenAnswer(inv -> inv.getArgument(0));
 
         List<Card> result = adminCardService.getCards(0, 10);
 
-        assertThat(result).hasSize(1).contains(card);
+        assertThat(result).hasSize(1).contains(activeCard);
+        verify(cardEncryptor).decryptCard(activeCard);
     }
 
     // ---------------- getToBlockCards ----------------
     @Test
     void getToBlockCards_shouldReturnDecryptedCards_whenCardsExist() {
-        Card card = Generator.generateCard();
+        Card card = Generator.generateCard(user);
+        card.setStatus("TO_BLOCK");
         Page<Card> page = new PageImpl<>(List.of(card));
-        when(cardRepository.findAllByStatus(eq("TO_BLOCK"), any(Pageable.class))).thenReturn(page);
         when(cardEncryptor.decryptCard(any(Card.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(cardRepository.findAllByStatus(eq("TO_BLOCK"), any(Pageable.class))).thenReturn(page);
 
         List<Card> result = adminCardService.getToBlockCards(0, 10);
 
         assertThat(result).hasSize(1).contains(card);
+        assertThat(result.get(0).getStatus()).isEqualTo("TO_BLOCK");
+        verify(cardEncryptor).decryptCard(card);
     }
 
     // ---------------- updateCard ----------------
     @Test
     void updateCard_shouldSaveUpdatedCard_whenCardExists() {
-        Card oldCard = Generator.generateCard();
-        Card newCard = Generator.generateCard();
-        when(cardRepository.findById(oldCard.getId())).thenReturn(Optional.of(oldCard));
+        Card newCard = Generator.generateCard(user);
         when(cardEncryptor.encrypt(anyString())).thenAnswer(inv -> inv.getArgument(0));
-        when(cardRepository.save(any(Card.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(cardRepository.findById(activeCard.getId())).thenReturn(Optional.of(activeCard));
 
-        adminCardService.updateCard(oldCard.getId(), newCard);
+        adminCardService.updateCard(activeCard.getId(), newCard);
 
+        assertThat(newCard.getId()).isEqualTo(activeCard.getId());
         verify(cardRepository).save(newCard);
-        assertThat(newCard.getId()).isEqualTo(oldCard.getId());
+        verify(cardEncryptor).encrypt(newCard.getCardNumber());
     }
 
     @Test
     void updateCard_shouldThrowException_whenCardNotFound() {
         UUID id = UUID.randomUUID();
-        Card newCard = Generator.generateCard();
         when(cardRepository.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class, () -> adminCardService.updateCard(id, newCard));
+        assertThrows(EntityNotFoundException.class, () -> adminCardService.updateCard(id, activeCard));
     }
 
     // ---------------- getCard ----------------
     @Test
     void getCard_shouldReturnDecryptedCard_whenCardExists() {
-        Card card = Generator.generateCard();
-        when(cardRepository.findById(card.getId())).thenReturn(Optional.of(card));
+        when(cardRepository.findById(activeCard.getId())).thenReturn(Optional.of(activeCard));
         when(cardEncryptor.decryptCard(any(Card.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        Card result = adminCardService.getCard(card.getId());
+        Card result = adminCardService.getCard(activeCard.getId());
 
-        assertThat(result).isEqualTo(card);
+        assertThat(result).isEqualTo(activeCard);
+        verify(cardEncryptor).decryptCard(activeCard);
     }
 
     @Test

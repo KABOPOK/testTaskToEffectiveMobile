@@ -29,6 +29,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -63,7 +64,6 @@ class UserCardServiceTest {
         SecurityContext context = mock(SecurityContext.class);
         when(context.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(context);
-
         when(userRepository.findByLogin(user.getLogin())).thenReturn(Optional.of(user));
     }
 
@@ -88,7 +88,6 @@ class UserCardServiceTest {
     @Test
     void getCard_shouldReturnDecryptedCard_whenActiveAndOwnedByUser() {
         when(cardRepository.findById(activeCard.getId())).thenReturn(Optional.of(activeCard));
-        when(cardEncryptor.decryptCardAndHidden(activeCard)).thenReturn(activeCard);
 
         Card result = userCardService.getCard(activeCard.getId());
 
@@ -108,18 +107,18 @@ class UserCardServiceTest {
     void getCardsByCardNumber_shouldReturnDecryptedCards() {
         when(cardRepository.findAllByCardBinStartingWithAndUser(any(), eq(user), any()))
                 .thenReturn(new PageImpl<>(List.of(activeCard)));
-        when(cardEncryptor.decryptCardAndHidden(activeCard)).thenReturn(activeCard);
+        when(cardEncryptor.decryptCardAndHidden(activeCard)).then(inv -> inv.getArgument(0));
 
         List<Card> result = userCardService.getCardsByCardNumber(0, 10, "123");
 
         assertThat(result).hasSize(1).contains(activeCard);
+        verify(cardEncryptor).decryptCardAndHidden(activeCard);
     }
 
     // ---------------- requestCardBlock ----------------
     @Test
     void requestCardBlock_shouldUpdateStatusToToBlock() {
         when(cardRepository.findById(activeCard.getId())).thenReturn(Optional.of(activeCard));
-        when(cardRepository.save(any(Card.class))).thenAnswer(inv -> inv.getArgument(0));
 
         userCardService.requestCardBlock(activeCard.getId());
 
@@ -160,6 +159,8 @@ class UserCardServiceTest {
 
         assertThrows(AccessDeniedException.class,
                 () -> userCardService.transferMoney(activeCard.getId(), toCard.getId(), BigDecimal.valueOf(2000)));
+        assertThat(activeCard.getBalance()).isEqualTo(BigDecimal.valueOf(1000));
+        assertThat(toCard.getBalance()).isEqualTo(BigDecimal.valueOf(50));
     }
 }
 
