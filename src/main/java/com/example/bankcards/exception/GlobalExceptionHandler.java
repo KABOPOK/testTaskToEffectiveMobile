@@ -4,11 +4,15 @@ import generated.com.example.bankcards.api.model.ApiError;
 import generated.com.example.bankcards.api.model.ExceptionBody;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.RollbackException;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.transaction.TransactionSystemException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -48,6 +52,18 @@ public class GlobalExceptionHandler {
                 List.of(new ApiError("Access denied", ex.getMessage()))
         );
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
+    }
+
+    @ExceptionHandler(TransactionSystemException.class)
+    public ResponseEntity<ExceptionBody> handleRollbackException(RollbackException ex) {
+        Throwable cause = ex.getCause();
+        if (cause instanceof jakarta.validation.ConstraintViolationException violationEx) {
+            List<ApiError> errors = violationEx.getConstraintViolations().stream()
+                    .map(v -> new ApiError(v.getPropertyPath().toString(), v.getMessage()))
+                    .toList();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionBody(errors));
+        }
+        return handleAll(ex);
     }
 
     @ExceptionHandler(Exception.class)

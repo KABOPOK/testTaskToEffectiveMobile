@@ -11,6 +11,8 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -36,12 +38,16 @@ public class User {
     private UUID id;
 
     @Column(name = "name", nullable = false)
+    @Size(min = 2, max = 50, message = "Name must be between 2 and 50 characters")
     private String name;
 
     @Column(name = "login", nullable = false, unique = true)
+    @Size(min = 4, max = 20, message = "Login must be between 4 and 20 characters")
+    @Pattern(regexp = "^[a-zA-Z0-9._-]+$", message = "Login can contain only letters, digits, dots, underscores and hyphens")
     private String login;
 
     @Column(name = "password", nullable = false)
+    @Size(min = 6, max = 100, message = "Password must be at least 6 characters")
     private String password;
 
     @Column(name = "status", nullable = false)
