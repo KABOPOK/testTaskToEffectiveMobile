@@ -47,8 +47,9 @@ public class CardEncryptor {
         return card;
     }
     public Card decryptCardAndHidden(Card card) {
-        String hideCardNumber = "**** **** **** " +
-                encrypt(card.getCardNumber()).substring(card.getCardNumber().length()-4, card.getCardNumber().length());
+        String decryptedCardNumber = decrypt(card.getCardNumber());
+        String hideCardNumber = "************" + decryptedCardNumber
+                .substring(decryptedCardNumber.length()-4);
         card.setCardNumber(hideCardNumber);
         return card;
     }
