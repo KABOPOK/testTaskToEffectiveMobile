@@ -67,15 +67,13 @@ public class AdminUserService extends DefaultService implements UserDetailsServi
 
     public void updateUser(UUID id, User updatedUser) {
         User existingUser = getOrThrow(id, userRepository::findById);
-        updatedUser.setId(existingUser.getId());
-        updatedUser.setLogin(existingUser.getLogin());
-        updatedUser.setName(existingUser.getName());
-        updatedUser.setCards(existingUser.getCards());
-        updatedUser.setRoles(existingUser.getRoles());
-        updatedUser.setStatus("ACTIVE");
-        updatedUser.setUpdatedAt(Instant.now());
-        updatedUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
-        userRepository.save(updatedUser);
+        existingUser.setLogin(updatedUser.getLogin());
+        existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+        existingUser.setRoles(updatedUser.getRoles());
+        existingUser.setUpdatedAt(Instant.now());
+        existingUser.setName(updatedUser.getName());
+        existingUser.setStatus(updatedUser.getStatus());
+        userRepository.save(existingUser);
     }
 
     public void deleteUser(UUID id) {

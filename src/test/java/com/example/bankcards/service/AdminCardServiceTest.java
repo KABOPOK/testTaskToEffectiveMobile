@@ -16,6 +16,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -145,13 +147,16 @@ public class AdminCardServiceTest {
     // ---------------- updateCard ----------------
     @Test
     void updateCard_shouldSaveUpdatedCard_whenCardExists() {
-        Card newCard = Generator.generateCard(user);
+        Card newCard = activeCard;
+        newCard.setStatus("BLOCKED");
+        newCard.setCardNumber("1234567812345670");
+        newCard.setExpirationDate(LocalDate.now().plusDays(1));
         when(cardEncryptor.encrypt(anyString())).thenAnswer(inv -> inv.getArgument(0));
         when(cardRepository.findById(activeCard.getId())).thenReturn(Optional.of(activeCard));
 
         adminCardService.updateCard(activeCard.getId(), newCard);
 
-        assertThat(newCard.getId()).isEqualTo(activeCard.getId());
+        assertThat(newCard).isEqualTo(activeCard);
         verify(cardRepository).save(newCard);
         verify(cardEncryptor).encrypt(newCard.getCardNumber());
     }

@@ -60,11 +60,13 @@ public class AdminCardService extends DefaultService {
 
     public void updateCard(UUID id, Card updatedCard){
         Card card = getOrThrow(id, cardRepository::findById);
-        updatedCard.setId(card.getId());
-        updatedCard.setCreatedAt(card.getCreatedAt());
-        updatedCard.setUpdatedAt(Instant.now());
-        updatedCard.setCardNumber(cardEncryptor.encrypt(card.getCardNumber()));
-        cardRepository.save(updatedCard);
+        card.setCardNumber(cardEncryptor.encrypt(updatedCard.getCardNumber()));
+        card.setCardBin(updatedCard.getCardNumber().substring(0, 6));
+        card.setUpdatedAt(Instant.now());
+        card.setStatus(updatedCard.getStatus());
+        card.setExpirationDate(updatedCard.getExpirationDate());
+        card.setBalance(updatedCard.getBalance());
+        cardRepository.save(card);
     }
 
     public Card getCard(UUID id) {

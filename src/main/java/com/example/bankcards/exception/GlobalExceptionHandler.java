@@ -9,6 +9,7 @@ import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -24,6 +25,7 @@ public class GlobalExceptionHandler {
         ExceptionBody body = new ExceptionBody(
                 List.of(new ApiError("AlreadyExists", ex.getMessage()))
         );
+        log.error(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
 
@@ -32,6 +34,7 @@ public class GlobalExceptionHandler {
         ExceptionBody body = new ExceptionBody(
                 List.of(new ApiError("Not Found", ex.getMessage()))
         );
+        log.error(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
 
@@ -40,6 +43,7 @@ public class GlobalExceptionHandler {
         ExceptionBody body = new ExceptionBody(
                 List.of(new ApiError("Entity blocked", ex.getMessage()))
         );
+        log.error(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
     }
 
@@ -48,6 +52,7 @@ public class GlobalExceptionHandler {
         ExceptionBody body = new ExceptionBody(
                 List.of(new ApiError("Access denied", ex.getMessage()))
         );
+        log.error(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
     }
 
@@ -56,8 +61,19 @@ public class GlobalExceptionHandler {
         ExceptionBody body = new ExceptionBody(
                 List.of(new ApiError("Validation error", ex.getMessage()))
         );
+        log.error(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ExceptionBody> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        ExceptionBody body = new ExceptionBody(
+                List.of(new ApiError("Validation error", ex.getMessage()))
+        );
+        log.error(ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
 
     @ExceptionHandler(TransactionSystemException.class)
     public ResponseEntity<ExceptionBody> handleRollbackException(RollbackException ex) {
@@ -66,8 +82,10 @@ public class GlobalExceptionHandler {
             List<ApiError> errors = violationEx.getConstraintViolations().stream()
                     .map(v -> new ApiError(v.getPropertyPath().toString(), v.getMessage()))
                     .toList();
+            log.error(ex.getMessage(), ex);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionBody(errors));
         }
+        log.error(ex.getMessage(), ex);
         return handleAll(ex);
     }
 
@@ -77,6 +95,7 @@ public class GlobalExceptionHandler {
         ExceptionBody body = new ExceptionBody(
                 List.of(new ApiError("Internal server error", "something went wrong"))
         );
+        log.error(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 

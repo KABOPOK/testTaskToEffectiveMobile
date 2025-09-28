@@ -11,6 +11,7 @@ import generated.com.example.bankcards.api.model.TransferDataDto;
 import generated.com.example.bankcards.api.model.UserAdminUpdateDto;
 import generated.com.example.bankcards.api.model.UserDto;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -37,6 +38,8 @@ public class Generator {
         card.setStatus("ACTIVE");
         card.setBalance(BigDecimal.valueOf(1000));
         card.setUser(generateUser());
+        card.setCreatedAt(Instant.now());
+        card.setUpdatedAt(Instant.now());
         return card;
     }
     public static Card generateCard(User user) {
@@ -49,6 +52,8 @@ public class Generator {
         card.setStatus("ACTIVE");
         card.setBalance(BigDecimal.valueOf(1000));
         card.setUser(user);
+        card.setCreatedAt(Instant.now());
+        card.setUpdatedAt(Instant.now());
         return card;
     }
 
@@ -60,6 +65,8 @@ public class Generator {
         user.setPassword(randomStringGenerator(10));
         user.setStatus("ACTIVE");
         user.setRoles(List.of(roleUser));
+        user.setCreatedAt(Instant.now());
+        user.setUpdatedAt(Instant.now());
         return user;
     }
 

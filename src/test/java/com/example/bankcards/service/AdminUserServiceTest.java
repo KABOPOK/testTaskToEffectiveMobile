@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.StatusResultMatchersExtensionsKt.isEqualTo;
 
 @ExtendWith(MockitoExtension.class)
 class AdminUserServiceTest {
@@ -143,17 +144,19 @@ class AdminUserServiceTest {
     // ---------------- updateUser ----------------
     @Test
     void updateUser_shouldUpdateUser() {
-        User updated = Generator.generateUser();
-        updated.setPassword("newPass");
+        User updated = activeUser;
+        updated.setPassword("NewPass");
         updated.setLogin("panda");
+        updated.setStatus("TO_BLOCK");
         when(passwordEncoder.encode(any())).thenAnswer(inv -> inv.getArgument(0));
         when(userRepository.findById(activeUser.getId())).thenReturn(Optional.of(activeUser));
 
         adminUserService.updateUser(activeUser.getId(), updated);
+        updated.setUpdatedAt(activeUser.getUpdatedAt());
 
-        assertThat(activeUser.getLogin()).isEqualTo(updated.getLogin());
+        assertThat(updated).isEqualTo(activeUser);
         verify(userRepository).save(updated);
-        verify(passwordEncoder).encode(updated.getPassword());
+        verify(passwordEncoder).encode("NewPass");
     }
 
     // ---------------- deleteUser ----------------
