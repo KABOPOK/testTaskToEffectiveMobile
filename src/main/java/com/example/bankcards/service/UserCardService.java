@@ -101,8 +101,10 @@ public class UserCardService extends DefaultService {
         cardRepository.save(toCard);
     }
 
-    public List<Card> getAllCards() {
-        return cardRepository.findCardByUser(getCurrentUser()).stream().map(cardEncryptor::decryptCardAndHidden).toList();
+    public List<Card> getAllCards(Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Card> pageOfCards = cardRepository.findCardByUser(getCurrentUser(),pageable).map(cardEncryptor::decryptCardAndHidden);
+        return pageOfCards.getContent();
     }
 
 }

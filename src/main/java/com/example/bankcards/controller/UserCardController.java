@@ -22,8 +22,8 @@ public class UserCardController implements UserCardApi {
     private final CardMapper cardMapper;
 
     @Override
-    public List<CardDto> getAllUserCards() {
-        List<Card> cardList = userCardService.getAllCards();
+    public List<CardDto> getAllUserCards(Integer page, Integer size) {
+        List<Card> cardList = userCardService.getAllCards(page, size);
         return cardList.stream().map(cardMapper::mapToCardDto).toList();
     }
 

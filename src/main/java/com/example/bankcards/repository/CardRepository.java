@@ -20,6 +20,6 @@ public interface CardRepository extends JpaRepository<Card, UUID> {
     Page<Card> findAllByCardBinStartingWithAndUser(String cardNumber, User user, Pageable pageable);
 
     List<Card> findAllByExpirationDateBeforeAndStatusNot(LocalDate now, String expired);
-    List<Card> findCardByUser(User user);
+    Page<Card> findCardByUser(User user, Pageable pageable);
 
 }

@@ -88,7 +88,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CardWithUserIdDto'
+              $ref: '#/components/schemas/CardDto'
       responses:
         '200':
           description: Обновлена карта
@@ -469,11 +469,26 @@ paths:
     get:
       tags:
         - User-Card
-      summary: Получить все карты пользователя
+      summary: Получить все карты пользователя (с пагинацией)
       operationId: getAllUserCards
+      parameters:
+        - name: page
+          in: query
+          description: Номер страницы (начинается с 0)
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          description: Количество элементов на странице
+          required: false
+          schema:
+            type: integer
+            default: 10
       responses:
         '200':
-          description: Список карт пользователя
+          description: Список карт пользователя (с учетом пагинации)
           content:
             application/json:
               schema:
@@ -673,6 +688,7 @@ components:
         id:
           type: string
           format: uuid
+          readOnly: true
         cardNumber:
           type: string
         ownerName:

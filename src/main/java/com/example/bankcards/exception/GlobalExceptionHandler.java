@@ -74,6 +74,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ExceptionBody> handleIllegalArgumentException(IllegalArgumentException ex) {
+        ExceptionBody body = new ExceptionBody(
+                List.of(new ApiError("Validation error", ex.getMessage()))
+        );
+        log.error(ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
 
     @ExceptionHandler(TransactionSystemException.class)
     public ResponseEntity<ExceptionBody> handleRollbackException(RollbackException ex) {

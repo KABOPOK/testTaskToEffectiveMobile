@@ -18,4 +18,8 @@ public class CardMapperHelper {
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
     }
 
+    public UUID map(User user) {
+        return user.getId();
+    }
+
 }

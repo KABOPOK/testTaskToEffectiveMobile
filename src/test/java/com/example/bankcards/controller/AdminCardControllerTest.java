@@ -6,6 +6,7 @@ import com.example.bankcards.mappers.CardMapper;
 import com.example.bankcards.service.AdminCardService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import generated.com.example.bankcards.api.model.CardDto;
 import generated.com.example.bankcards.api.model.CardWithUserIdDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -139,7 +140,7 @@ class AdminCardControllerTest {
 
     @Test
     void updateCard_shouldReturnOk() throws Exception {
-        when(cardMapper.map(any(CardWithUserIdDto.class))).thenReturn(card);
+        when(cardMapper.map(any(CardDto.class))).thenReturn(card);
 
         mockMvc.perform(put("/api/admin/card/update/{id}", card.getId())
                         .contentType(MediaType.APPLICATION_JSON)

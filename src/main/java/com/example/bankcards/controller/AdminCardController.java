@@ -4,6 +4,7 @@ import com.example.bankcards.entity.Card;
 import com.example.bankcards.mappers.CardMapper;
 import com.example.bankcards.service.AdminCardService;
 import generated.com.example.bankcards.api.AdminCardApi;
+import generated.com.example.bankcards.api.model.CardDto;
 import generated.com.example.bankcards.api.model.CardWithUserIdDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
@@ -54,8 +55,8 @@ public class AdminCardController implements AdminCardApi {
     }
 
     @Override
-    public void updateCard(UUID id, CardWithUserIdDto cardWithUserIdDto) {
-        Card card = cardMapper.map(cardWithUserIdDto);
+    public void updateCard(UUID id, CardDto cardDto) {
+        Card card = cardMapper.map(cardDto);
         adminCardService.updateCard(id, card);
     }
 

@@ -13,6 +13,7 @@ public interface CardMapper {
     CardDto mapToCardDto (Card card);
     @Mapping(target = "user", source = "userId")
     Card map (CardWithUserIdDto cardWithUserIdDto);
+    @Mapping(target = "userId", source = "user")
     CardWithUserIdDto map (Card card);
 
 }
