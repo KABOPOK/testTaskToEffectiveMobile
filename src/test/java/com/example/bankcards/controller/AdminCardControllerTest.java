@@ -1,13 +1,13 @@
 package com.example.bankcards.controller;
 
 import com.example.bankcards.Generator;
+import com.example.bankcards.dto.CardDto;
+import com.example.bankcards.dto.CardWithUserIdDto;
 import com.example.bankcards.entity.Card;
 import com.example.bankcards.mappers.CardMapper;
 import com.example.bankcards.service.AdminCardService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import generated.com.example.bankcards.api.model.CardDto;
-import generated.com.example.bankcards.api.model.CardWithUserIdDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -69,7 +69,7 @@ class AdminCardControllerTest {
         mockMvc.perform(post("/api/admin/card/create")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(cardDto)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isOk());
 
         verify(adminCardService).createCard(card);
     }

@@ -1,8 +1,8 @@
 package com.example.bankcards.mappers;
 
+import com.example.bankcards.dto.CardDto;
+import com.example.bankcards.dto.CardWithUserIdDto;
 import com.example.bankcards.entity.Card;
-import generated.com.example.bankcards.api.model.CardDto;
-import generated.com.example.bankcards.api.model.CardWithUserIdDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

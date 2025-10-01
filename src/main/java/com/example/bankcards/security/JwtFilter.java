@@ -1,9 +1,9 @@
 package com.example.bankcards.security;
 
+import com.example.bankcards.dto.ApiError;
+import com.example.bankcards.dto.ExceptionBody;
 import com.example.bankcards.util.JwtTokenUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import generated.com.example.bankcards.api.model.ApiError;
-import generated.com.example.bankcards.api.model.ExceptionBody;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;

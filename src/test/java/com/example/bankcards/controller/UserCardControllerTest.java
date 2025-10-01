@@ -1,14 +1,14 @@
 package com.example.bankcards.controller;
 
 import com.example.bankcards.Generator;
+import com.example.bankcards.dto.BalanceDto;
+import com.example.bankcards.dto.CardDto;
+import com.example.bankcards.dto.TransferDataDto;
 import com.example.bankcards.entity.Card;
 import com.example.bankcards.mappers.CardMapper;
 import com.example.bankcards.service.UserCardService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import generated.com.example.bankcards.api.model.BalanceDto;
-import generated.com.example.bankcards.api.model.CardDto;
-import generated.com.example.bankcards.api.model.TransferDataDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

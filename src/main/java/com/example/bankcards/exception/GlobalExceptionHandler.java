@@ -1,7 +1,7 @@
 package com.example.bankcards.exception;
 
-import generated.com.example.bankcards.api.model.ApiError;
-import generated.com.example.bankcards.api.model.ExceptionBody;
+import com.example.bankcards.dto.ApiError;
+import com.example.bankcards.dto.ExceptionBody;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.RollbackException;

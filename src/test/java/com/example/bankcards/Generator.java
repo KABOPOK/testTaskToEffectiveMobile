@@ -1,15 +1,15 @@
 package com.example.bankcards;
 
+import com.example.bankcards.dto.AuthDataDto;
+import com.example.bankcards.dto.CardDto;
+import com.example.bankcards.dto.CardWithUserIdDto;
+import com.example.bankcards.dto.TokenDto;
+import com.example.bankcards.dto.TransferDataDto;
+import com.example.bankcards.dto.UserAdminUpdateDto;
+import com.example.bankcards.dto.UserDto;
 import com.example.bankcards.entity.Card;
 import com.example.bankcards.entity.Role;
 import com.example.bankcards.entity.User;
-import generated.com.example.bankcards.api.model.AuthDataDto;
-import generated.com.example.bankcards.api.model.CardDto;
-import generated.com.example.bankcards.api.model.CardWithUserIdDto;
-import generated.com.example.bankcards.api.model.TokenDto;
-import generated.com.example.bankcards.api.model.TransferDataDto;
-import generated.com.example.bankcards.api.model.UserAdminUpdateDto;
-import generated.com.example.bankcards.api.model.UserDto;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -77,7 +77,7 @@ public class Generator {
         dto.setCardNumber(card.getCardNumber());
         dto.setOwnerName(card.getOwnerName());
         dto.setExpirationDate(card.getExpirationDate());
-        dto.setStatus(card.getStatus());
+        dto.setStatus(CardWithUserIdDto.StatusEnum.valueOf(card.getStatus()));
         return dto;
 
     }
@@ -122,7 +122,7 @@ public class Generator {
         CardDto dto = new CardDto();
         dto.setId(card.getId());
         dto.setCardNumber(card.getCardNumber());
-        dto.setStatus(card.getStatus());
+        dto.setStatus(CardDto.StatusEnum.valueOf(card.getStatus()));
         dto.setBalance(Double.parseDouble(card.getBalance().toString()));
         dto.setCreatedAt(card.getCreatedAt());
         dto.setUpdatedAt(card.getUpdatedAt());

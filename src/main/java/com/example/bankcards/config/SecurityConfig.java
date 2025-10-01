@@ -1,8 +1,8 @@
 package com.example.bankcards.config;
+import com.example.bankcards.dto.ApiError;
+import com.example.bankcards.dto.ExceptionBody;
 import com.example.bankcards.security.JwtFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import generated.com.example.bankcards.api.model.ApiError;
-import generated.com.example.bankcards.api.model.ExceptionBody;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

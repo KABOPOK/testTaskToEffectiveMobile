@@ -36,9 +36,6 @@ public class AdminCardService extends DefaultService {
         if (existedCard != null) throw new EntityExistsException(format(ENTITY_ALREADY_EXIST, existedCard.getId()));
         if (card.getCardNumber().length() != 16)
             throw new ValidationException(format("card number length should be 16 instead of %s", card.getCardNumber().length()));
-        if (!card.getStatus().equals("BLOCKED")&&!card.getStatus().equals("ACTIVE")
-                &&!card.getStatus().equals("TO_BLOCK")&&!card.getStatus().equals("EXPIRED"))
-            throw new ValidationException(format("invalid card status %s", card.getStatus()));
         card.setCardNumber(cardEncryptor.encrypt(card.getCardNumber()));
         card.setCreatedAt(Instant.now());
         card.setUpdatedAt(Instant.now());

@@ -1,9 +1,9 @@
 package com.example.bankcards.mappers;
 
+import com.example.bankcards.dto.AuthDataDto;
+import com.example.bankcards.dto.UserAdminUpdateDto;
+import com.example.bankcards.dto.UserDto;
 import com.example.bankcards.entity.User;
-import generated.com.example.bankcards.api.model.AuthDataDto;
-import generated.com.example.bankcards.api.model.UserAdminUpdateDto;
-import generated.com.example.bankcards.api.model.UserDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
