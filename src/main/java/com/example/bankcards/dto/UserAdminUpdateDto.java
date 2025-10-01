@@ -19,9 +19,7 @@ public class UserAdminUpdateDto {
     private UUID id;
 
     private String name;
-
     private String login;
-
     private String password;
 
     public enum StatusEnum {

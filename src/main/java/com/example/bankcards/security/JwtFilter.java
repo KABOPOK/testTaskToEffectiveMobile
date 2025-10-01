@@ -1,7 +1,7 @@
 package com.example.bankcards.security;
 
-import com.example.bankcards.dto.ApiError;
-import com.example.bankcards.dto.ExceptionBody;
+import com.example.bankcards.dto.ApiErrorDto;
+import com.example.bankcards.dto.ExceptionBodyDto;
 import com.example.bankcards.util.JwtTokenUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -39,15 +39,15 @@ public class JwtFilter extends OncePerRequestFilter {
             }
             filterChain.doFilter(request, response);
         } catch (ExpiredJwtException ex) {
-            ExceptionBody body = new ExceptionBody(
-                    List.of(new ApiError("TokenExpired", "JWT token has expired"))
+            ExceptionBodyDto body = new ExceptionBodyDto(
+                    List.of(new ApiErrorDto("TokenExpired", "JWT token has expired"))
             );
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write(new ObjectMapper().writeValueAsString(body));
         } catch (JwtException ex) {
-            ExceptionBody body = new ExceptionBody(
-                    List.of(new ApiError("JwtError", "Invalid JWT token"))
+            ExceptionBodyDto body = new ExceptionBodyDto(
+                    List.of(new ApiErrorDto("JwtError", "Invalid JWT token"))
             );
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

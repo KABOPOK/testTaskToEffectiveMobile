@@ -3,7 +3,870 @@ info:
   title: BankApi
   description: CRUD API для управления банковскими картами
   version: 1.0.0
-
 paths:
+  # --- Admin Card Controller ---
+  /api/admin/card/create:
+    post:
+      tags:
+        - Admin-Card
+      summary: Создать новую карту
+      operationId: createCard
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CardWithUserIdDto'
+      responses:
+        '201':
+          description: Создана карта
+        '400':
+          description: Ошибка валидации данных
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '409':
+          description: Конфликт
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+  /api/admin/card/get/{id}:
+    get:
+      tags:
+        - Admin-Card
+      summary: Получить карту по ID
+      operationId: getCardById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Карта
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardWithUserIdDto'
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '404':
+          description: Карта не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+  /api/admin/card/update/{id}:
+    put:
+      tags:
+        - Admin-Card
+      summary: Обновить карту по ID
+      operationId: updateCard
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CardDto'
+      responses:
+        '200':
+          description: Обновлена карта
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '404':
+          description: Карта не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+  /api/admin/card/block/{id}:
+    put:
+      tags:
+        - Admin-Card
+      summary: Заблокировать карту по ID
+      operationId: blockCard
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Карта успешно заблокирована
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '404':
+          description: Карта не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+  /api/admin/card/delete/{id}:
+    delete:
+      tags:
+        - Admin-Card
+      summary: Удалить карту по ID
+      operationId: deleteCard
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Карта удалена
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '404':
+          description: Карта не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+  /api/admin/card/get_to_block:
+    get:
+      tags:
+        - Admin-Card
+      summary: Получить список карт, ожидающих блокировки (со статусом TO_BLOCK)
+      operationId: getCardsToBlock
+      parameters:
+        - name: page
+          in: query
+          description: Номер страницы (начинается с 0)
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          description: Количество элементов на странице
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Список карт со статусом TO_BLOCK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CardWithUserIdDto'
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+  /api/admin/card/get_all:
+    get:
+      tags:
+        - Admin-Card
+      summary: Получить список всех карт
+      operationId: getAllCards
+      parameters:
+        - name: page
+          in: query
+          description: Номер страницы (начинается с 0)
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          description: Количество элементов на странице
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Список карт
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CardWithUserIdDto'
+        '404':
+          description: Карта не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
 
+  # --- Admin User Controller ---
+  /api/admin/user/update/{id}:
+    put:
+      tags:
+        - Admin-User
+      summary: Обновить данные пользователя
+      operationId: updateUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserAdminUpdateDto'
+      responses:
+        '200':
+          description: Пользователь обновлен
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '404':
+          description: Пользователь не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+  /api/admin/user/block/{id}:
+    put:
+      tags:
+        - Admin-User
+      summary: Заблокировать пользователя
+      operationId: blockUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Пользователь заблокирован
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '404':
+          description: Пользователь не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+  /api/admin/user/get/{id}:
+    get:
+      tags:
+        - Admin-User
+      summary: Заблокировать пользователя
+      operationId: getUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Пользователь найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '404':
+          description: Пользователь не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+  /api/admin/user/get_all_users:
+    get:
+      tags:
+        - Admin-User
+      summary: Получить всех пользователей
+      operationId: getAllUsers
+      responses:
+        '200':
+          description: Список пользователей
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserDto'
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+  /api/admin/user/delete/{id}:
+    delete:
+      tags:
+        - Admin-User
+      summary: Удалить пользователя
+      operationId: deleteUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Пользователь заблокирован
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '404':
+          description: Пользователь не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+
+  # --- User Card Controller ---
+  /api/user/card/get_cards_by_number:
+    get:
+      tags:
+        - User-Card
+      summary: Получить список своих карт
+      operationId: getCards
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: cardNumber
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Список карт
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CardDto'
+        '404':
+          description: Карта не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '403':
+          description: Отказ доступа
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+  /api/user/card/{id}:
+    get:
+      tags:
+        - User-Card
+      summary: Получить карту по ID
+      operationId: getCardById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Карта найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardDto'
+        '404':
+          description: Карта не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '403':
+          description: Отказ доступа
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+  /api/user/get_all_cards:
+    get:
+      tags:
+        - User-Card
+      summary: Получить все карты пользователя (с пагинацией)
+      operationId: getAllUserCards
+      parameters:
+        - name: page
+          in: query
+          description: Номер страницы (начинается с 0)
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          description: Количество элементов на странице
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Список карт пользователя (с учетом пагинации)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CardDto'
+        '404':
+          description: Карты не найдены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '403':
+          description: Отказ доступа
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+  /api/user/card/request_to_block/{id}:
+    put:
+      tags:
+        - User-Card
+      summary: Отправить запрос на блокировку карты
+      operationId: requestCardBlock
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Запрос на блокировку отправлен
+        '404':
+          description: Карта не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '403':
+          description: Отказ доступа
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+  /api/user/card/balance/{id}:
+    get:
+      tags:
+        - User-Card
+      summary: Получить баланс карты по ID
+      operationId: getCardBalance
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID карты
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Баланс карты
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalanceDto'
+        '404':
+          description: Карта не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '403':
+          description: Отказ доступа
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+  /api/user/card/transfer:
+    put:
+      tags:
+        - User-Card
+      summary: Перевод средств между картами
+      operationId: transferBetweenCards
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferDataDto'
+      responses:
+        '200':
+          description: Перевод успешно выполнен
+        '404':
+          description: Карта не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '403':
+          description: Отказ доступа
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+
+  # --- Auth Controller ---
+  /api/public/user/register:
+    post:
+      tags:
+        - Auth
+      summary: Регистрация нового пользователя
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDto'
+      responses:
+        '200':
+          description: Пользователь зарегистрирован
+        '400':
+          description: Ошибка валидации данных
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '409':
+          description: Конфликт
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+  /api/public/user/auth:
+    post:
+      tags:
+        - Auth
+      summary: Аутентификация и получение токена
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/authDataDto'
+      responses:
+        '200':
+          description: JWT токен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tokenDto'
+        '401':
+          description: Неверный логин или пароль
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+        '403':
+          description: Пользователь Заблокирован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionBody'
+
+components:
+  schemas:
+    CardDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        cardNumber:
+          type: string
+        ownerName:
+          type: string
+        expirationDate:
+          type: string
+          format: date
+        status:
+          type: string
+        balance:
+          type: number
+          format: double
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+        - cardNumber
+        - ownerName
+        - expirationDate
+        - status
+    CardWithUserIdDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        cardNumber:
+          type: string
+        ownerName:
+          type: string
+        expirationDate:
+          type: string
+          format: date
+        status:
+          type: string
+        balance:
+          type: number
+          format: double
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        userId:
+          type: string
+          format: uuid
+      required:
+        - cardNumber
+        - ownerName
+        - expirationDate
+        - status
+        - userId
+    UserAdminUpdateDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+        login:
+          type: string
+        password:
+          type: string
+          writeOnly: true
+        status:
+          type: string
+          enum: [ ACTIVE, BLOCKED ]
+        roles:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+    UserDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+        login:
+          type: string
+        password:
+          type: string
+        status:
+          type: string
+          enum: [ ACTIVE, BLOCKED ]
+          readOnly: true
+        roles:
+          readOnly: true
+          type: array
+          items:
+            readOnly: true
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+        - login
+        - name
+        - password
+    authDataDto:
+      type: object
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+      required:
+        - login
+        - password
+    tokenDto:
+      type: object
+      properties:
+        token:
+          type: string
+    ApiError:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+      required:
+        - title
+        - description
+    ExceptionBody:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+      required:
+        - errors
+    BalanceDto:
+      type: object
+      properties:
+        balance:
+          type: string
+          format: bigdecimal
+    TransferDataDto:
+      type: object
+      properties:
+        fromCardId:
+          type: string
+          format: uuid
+        toCardId:
+          type: string
+          format: uuid
+        amount:
+          type: number
+          format: double
+      required:
+        - fromCardId
+        - toCardId
+        - amount
 

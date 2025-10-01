@@ -3,11 +3,12 @@ package com.example.bankcards.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
-public class ApiError {
+public class ExceptionBodyDto {
 
-    private String title;
-    private String description;
+    private List<ApiErrorDto> errors;
 
 }

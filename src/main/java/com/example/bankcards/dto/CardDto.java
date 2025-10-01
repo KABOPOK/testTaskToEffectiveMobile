@@ -17,7 +17,6 @@ public class CardDto {
     private UUID id;
 
     private String cardNumber;
-
     private String ownerName;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
@@ -60,13 +59,14 @@ public class CardDto {
     }
 
     private StatusEnum status;
-
     private Double balance;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private java.time.Instant createdAt;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private java.time.Instant updatedAt;
 
 }

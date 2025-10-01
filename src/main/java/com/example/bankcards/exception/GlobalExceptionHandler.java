@@ -1,7 +1,7 @@
 package com.example.bankcards.exception;
 
-import com.example.bankcards.dto.ApiError;
-import com.example.bankcards.dto.ExceptionBody;
+import com.example.bankcards.dto.ApiErrorDto;
+import com.example.bankcards.dto.ExceptionBodyDto;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.RollbackException;
@@ -21,63 +21,63 @@ import java.util.List;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(EntityExistsException.class)
-    public ResponseEntity<ExceptionBody> handleEntityExistsException(EntityExistsException ex) {
-        ExceptionBody body = new ExceptionBody(
-                List.of(new ApiError("AlreadyExists", ex.getMessage()))
+    public ResponseEntity<ExceptionBodyDto> handleEntityExistsException(EntityExistsException ex) {
+        ExceptionBodyDto body = new ExceptionBodyDto(
+                List.of(new ApiErrorDto("AlreadyExists", ex.getMessage()))
         );
         log.error(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<ExceptionBody> handleEntityNotFoundException(EntityNotFoundException ex) {
-        ExceptionBody body = new ExceptionBody(
-                List.of(new ApiError("Not Found", ex.getMessage()))
+    public ResponseEntity<ExceptionBodyDto> handleEntityNotFoundException(EntityNotFoundException ex) {
+        ExceptionBodyDto body = new ExceptionBodyDto(
+                List.of(new ApiErrorDto("Not Found", ex.getMessage()))
         );
         log.error(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
 
     @ExceptionHandler(EntityBlockedException.class)
-    public ResponseEntity<ExceptionBody> handleEntityBlockedException(EntityBlockedException ex) {
-        ExceptionBody body = new ExceptionBody(
-                List.of(new ApiError("Entity blocked", ex.getMessage()))
+    public ResponseEntity<ExceptionBodyDto> handleEntityBlockedException(EntityBlockedException ex) {
+        ExceptionBodyDto body = new ExceptionBodyDto(
+                List.of(new ApiErrorDto("Entity blocked", ex.getMessage()))
         );
         log.error(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ExceptionBody> handleAccessDeniedException(AccessDeniedException ex) {
-        ExceptionBody body = new ExceptionBody(
-                List.of(new ApiError("Access denied", ex.getMessage()))
+    public ResponseEntity<ExceptionBodyDto> handleAccessDeniedException(AccessDeniedException ex) {
+        ExceptionBodyDto body = new ExceptionBodyDto(
+                List.of(new ApiErrorDto("Access denied", ex.getMessage()))
         );
         log.error(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
     }
 
     @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<ExceptionBody> handleValidationException(ValidationException ex) {
-        ExceptionBody body = new ExceptionBody(
-                List.of(new ApiError("Validation error", ex.getMessage()))
+    public ResponseEntity<ExceptionBodyDto> handleValidationException(ValidationException ex) {
+        ExceptionBodyDto body = new ExceptionBodyDto(
+                List.of(new ApiErrorDto("Validation error", ex.getMessage()))
         );
         log.error(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ExceptionBody> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
-        ExceptionBody body = new ExceptionBody(
-                List.of(new ApiError("Validation error", ex.getMessage()))
+    public ResponseEntity<ExceptionBodyDto> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        ExceptionBodyDto body = new ExceptionBodyDto(
+                List.of(new ApiErrorDto("Validation error", ex.getMessage()))
         );
         log.error(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ExceptionBody> handleIllegalArgumentException(IllegalArgumentException ex) {
-        ExceptionBody body = new ExceptionBody(
-                List.of(new ApiError("Validation error", ex.getMessage()))
+    public ResponseEntity<ExceptionBodyDto> handleIllegalArgumentException(IllegalArgumentException ex) {
+        ExceptionBodyDto body = new ExceptionBodyDto(
+                List.of(new ApiErrorDto("Validation error", ex.getMessage()))
         );
         log.error(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
@@ -85,24 +85,24 @@ public class GlobalExceptionHandler {
 
 
     @ExceptionHandler(TransactionSystemException.class)
-    public ResponseEntity<ExceptionBody> handleRollbackException(RollbackException ex) {
+    public ResponseEntity<ExceptionBodyDto> handleRollbackException(RollbackException ex) {
         Throwable cause = ex.getCause();
         if (cause instanceof jakarta.validation.ConstraintViolationException violationEx) {
-            List<ApiError> errors = violationEx.getConstraintViolations().stream()
-                    .map(v -> new ApiError(v.getPropertyPath().toString(), v.getMessage()))
+            List<ApiErrorDto> errors = violationEx.getConstraintViolations().stream()
+                    .map(v -> new ApiErrorDto(v.getPropertyPath().toString(), v.getMessage()))
                     .toList();
             log.error(ex.getMessage(), ex);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionBody(errors));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionBodyDto(errors));
         }
         log.error(ex.getMessage(), ex);
         return handleAll(ex);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ExceptionBody> handleAll(Exception ex) {
+    public ResponseEntity<ExceptionBodyDto> handleAll(Exception ex) {
         ex.printStackTrace();
-        ExceptionBody body = new ExceptionBody(
-                List.of(new ApiError("Internal server error", "something went wrong"))
+        ExceptionBodyDto body = new ExceptionBodyDto(
+                List.of(new ApiErrorDto("Internal server error", "something went wrong"))
         );
         log.error(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);

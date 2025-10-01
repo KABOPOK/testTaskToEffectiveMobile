@@ -1,6 +1,6 @@
 package com.example.bankcards.config;
-import com.example.bankcards.dto.ApiError;
-import com.example.bankcards.dto.ExceptionBody;
+import com.example.bankcards.dto.ApiErrorDto;
+import com.example.bankcards.dto.ExceptionBodyDto;
 import com.example.bankcards.security.JwtFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
@@ -59,16 +59,16 @@ public class SecurityConfig {
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, accessDeniedException) -> {
                             if(accessDeniedException instanceof DisabledException){return;}
-                            ExceptionBody body = new ExceptionBody(
-                                    List.of(new ApiError("AuthenticationFailed", "Wrong JWT token"))
+                            ExceptionBodyDto body = new ExceptionBodyDto(
+                                    List.of(new ApiErrorDto("AuthenticationFailed", "Wrong JWT token"))
                             );
                             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                             response.getWriter().write((new ObjectMapper().writeValueAsString(body)));
                         })
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
-                            ExceptionBody body = new ExceptionBody(
-                                    List.of(new ApiError("AccessDenied", "You don’t have permission to access this resource"))
+                            ExceptionBodyDto body = new ExceptionBodyDto(
+                                    List.of(new ApiErrorDto("AccessDenied", "You don’t have permission to access this resource"))
                             );
                             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                             response.setStatus(HttpServletResponse.SC_FORBIDDEN);

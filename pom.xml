@@ -130,42 +130,6 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
 
-            <!--openapi-plugin-->
-            <plugin>
-                <groupId>org.openapitools</groupId>
-                <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>7.9.0</version>
-                <executions>
-                    <execution>
-                        <id>api-v1</id>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <!--let be repeated -->
-                            <skipValidateSpec>true</skipValidateSpec>
-                            <!--let be repeated -->
-                            <inputSpec>${project.basedir}/docs/openapi.yaml</inputSpec>
-                            <generatorName>spring</generatorName>
-                            <apiPackage>generated.${package}.api</apiPackage>
-                            <modelPackage>generated.${package}.api.model</modelPackage>
-                            <supportingFilesToGenerate>ApiUtil.java</supportingFilesToGenerate>
-                            <typeMappings>
-                                <typeMapping>OffsetDateTime=java.time.Instant</typeMapping>
-                            </typeMappings>
-                            <configOptions>
-                                <openApiNullable>false</openApiNullable>
-                                <skipDefaultInterface>true</skipDefaultInterface>
-                                <interfaceOnly>true</interfaceOnly>
-                                <useTags>true</useTags>
-                                <useSpringBoot3>true</useSpringBoot3>
-                                <useResponseEntity>false</useResponseEntity>
-                            </configOptions>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
             <!--mapstruct-generator-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
